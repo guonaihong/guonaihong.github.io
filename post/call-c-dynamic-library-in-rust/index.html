@@ -49,7 +49,7 @@
 <meta itemprop="description" content="前言 c语言作为系统编程语言统治bit世界已经很久，留下了大量的代码遗产。rust作为新兴语言在一些冷门领域开发，真是裹足前行。rust如果可">
 <meta itemprop="datePublished" content="2020-12-21T15:08:12+08:00" />
 <meta itemprop="dateModified" content="2020-12-21T15:08:12+08:00" />
-<meta itemprop="wordCount" content="615">
+<meta itemprop="wordCount" content="718">
 
 
 
@@ -151,7 +151,11 @@
             <li><a href="#3运行">3.运行</a></li>
           </ul>
         </li>
-        <li><a href="#四优化工程更符合rust的方式">四、优化工程，更符合rust的方式</a></li>
+        <li><a href="#四优化工程更符合rust的方式">四、优化工程，更符合rust的方式</a>
+          <ul>
+            <li><a href="#使用buildrs编译和三2同样的效果">使用<code>build.rs</code>编译，和<code>三、2</code>同样的效果</a></li>
+          </ul>
+        </li>
         <li><a href="#参考资料">参考资料</a></li>
       </ul>
     </li>
@@ -284,8 +288,26 @@
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="四优化工程更符合rust的方式">四、优化工程，更符合rust的方式</h2>
-<p>这里不使用rustc直接编译，使用cargo工具。TODO</p>
-<h2 id="参考资料">参考资料</h2>
+<h3 id="使用buildrs编译和三2同样的效果">使用<code>build.rs</code>编译，和<code>三、2</code>同样的效果</h3>
+<p>这里对上面的编译方式做些优化，在rust里面一般是编写build.rs，生成依赖，以后在生成protobuf或者grpc代码还可以看到类似套路。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="c1">// build.rs rust的编译脚本
+</span><span class="c1"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;cargo:rustc-link-search=.&#34;</span><span class="p">);</span><span class="w"> </span><span class="c1">// 等于rustc -L .
+</span><span class="c1"></span><span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;cargo:rustc-link-lib=dylib=add&#34;</span><span class="p">);</span><span class="w"> </span><span class="c1">// 等于rustc -ladd
+</span><span class="c1"></span><span class="p">}</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="参考资料">参考资料</h2>
+<p><a href="https://doc.rust-lang.org/cargo/reference/build-scripts.html">https://doc.rust-lang.org/cargo/reference/build-scripts.html</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/70095462">https://zhuanlan.zhihu.com/p/70095462</a></p>
 <p><a href="http://liufuyang.github.io/2020/02/02/call-c-in-rust.html">http://liufuyang.github.io/2020/02/02/call-c-in-rust.html</a></p>
 
@@ -332,7 +354,7 @@
       <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
       <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
       <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
-      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="https://github.com/guonaihong" class="iconfont icon-github" title="github"></a>
       <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
       <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
       <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
