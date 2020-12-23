@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Even - A super concise theme for Hugo</title>
-    <link>http://localhost:1313/post/</link>
-    <description>Recent content in Posts on Even - A super concise theme for Hugo</description>
+    <title>rust on Even - A super concise theme for Hugo</title>
+    <link>http://localhost:1313/tags/rust/</link>
+    <description>Recent content in rust on Even - A super concise theme for Hugo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 23 Dec 2020 14:43:59 +0800</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 23 Dec 2020 14:43:59 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/rust/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Call C Dynamic Library in Rust Bingen 2</title>
       <link>http://localhost:1313/post/call-c-dynamic-library-in-rust-bingen-2/</link>

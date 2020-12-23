@@ -6,7 +6,16 @@
     <description>Recent content on Even - A super concise theme for Hugo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 21 Dec 2020 15:08:12 +0800</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 23 Dec 2020 14:43:59 +0800</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Call C Dynamic Library in Rust Bingen 2</title>
+      <link>http://localhost:1313/post/call-c-dynamic-library-in-rust-bingen-2/</link>
+      <pubDate>Wed, 23 Dec 2020 14:43:59 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/call-c-dynamic-library-in-rust-bingen-2/</guid>
+      <description>前言 在Call C dynamic library in rust文章里面已经介绍了手动绑定c头文件到rust里面， 这下终于可以在rust里面使用c语言遗产。但是这里有个问题，</description>
+    </item>
+    
     <item>
       <title>Call C dynamic library in rust</title>
       <link>http://localhost:1313/post/call-c-dynamic-library-in-rust/</link>
