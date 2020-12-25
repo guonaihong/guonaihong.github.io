@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Even - A super concise theme for Hugo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 23 Dec 2020 14:43:59 +0800</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 25 Dec 2020 15:31:11 +0800</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Name Semaphore as Process Lock</title>
+      <link>http://localhost:1313/post/name-semaphore-as-process-lock/</link>
+      <pubDate>Fri, 25 Dec 2020 15:31:11 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/name-semaphore-as-process-lock/</guid>
+      <description>前言 最近需要在rust里面使用多进程，有进程锁是第一步，毕竟进入临界区不能裸奔。 如果遥远的记忆没有出错，fcntl基于fd也可以实现进程锁，</description>
+    </item>
+    
     <item>
       <title>Call C Dynamic Library in Rust Bindgen 2</title>
       <link>http://localhost:1313/post/call-c-dynamic-library-in-rust-bingen-2/</link>

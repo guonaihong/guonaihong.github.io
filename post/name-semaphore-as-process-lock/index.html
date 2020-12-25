@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Name Semaphore as Process Lock - Even - A super concise theme for Hugo</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="guonaihong" /><meta name="description" content="前言 最近需要在rust里面使用多进程，有进程锁是第一步，毕竟进入临界区不能裸奔。 如果遥远的记忆没有出错，fcntl基于fd也可以实现进程锁，" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/name-semaphore-as-process-lock/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Name Semaphore as Process Lock" />
+<meta property="og:description" content="前言 最近需要在rust里面使用多进程，有进程锁是第一步，毕竟进入临界区不能裸奔。 如果遥远的记忆没有出错，fcntl基于fd也可以实现进程锁，" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/name-semaphore-as-process-lock/" />
+<meta property="article:published_time" content="2020-12-25T15:31:11+08:00" />
+<meta property="article:modified_time" content="2020-12-25T15:31:11+08:00" />
+<meta itemprop="name" content="Name Semaphore as Process Lock">
+<meta itemprop="description" content="前言 最近需要在rust里面使用多进程，有进程锁是第一步，毕竟进入临界区不能裸奔。 如果遥远的记忆没有出错，fcntl基于fd也可以实现进程锁，">
+<meta itemprop="datePublished" content="2020-12-25T15:31:11+08:00" />
+<meta itemprop="dateModified" content="2020-12-25T15:31:11+08:00" />
+<meta itemprop="wordCount" content="1025">
+
+
+
+<meta itemprop="keywords" content="rust," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Name Semaphore as Process Lock"/>
+<meta name="twitter:description" content="前言 最近需要在rust里面使用多进程，有进程锁是第一步，毕竟进入临界区不能裸奔。 如果遥远的记忆没有出错，fcntl基于fd也可以实现进程锁，"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">疯狂coding</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">疯狂coding</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Name Semaphore as Process Lock</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-12-25 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#前言">前言</a></li>
+        <li><a href="#一有名信号量c语言函数原型">一、有名信号量<code>c</code>语言函数原型</a>
+          <ul>
+            <li><a href="#1sem_open函数">1.<code>sem_open()</code>函数</a></li>
+            <li><a href="#2sem_wait函数">2.<code>sem_wait()</code>函数</a></li>
+            <li><a href="#3sem_post函数">3.<code>sem_post()</code>函数</a></li>
+          </ul>
+        </li>
+        <li><a href="#二信号量原理">二、信号量原理</a></li>
+        <li><a href="#三rust里面调用有名信号量">三、rust里面调用有名信号量</a>
+          <ul>
+            <li><a href="#1cargotoml配置">1.<code>Cargo.toml</code>配置</a></li>
+            <li><a href="#2rust里面调用有名信号量最小化example">2.rust里面调用有名信号量，最小化example</a></li>
+          </ul>
+        </li>
+        <li><a href="#四测试进程锁">四、测试进程锁</a>
+          <ul>
+            <li><a href="#1cargotoml配置-1">1.<code>Cargo.toml</code>配置</a></li>
+            <li><a href="#2测试代码">2.测试代码</a></li>
+          </ul>
+        </li>
+        <li><a href="#五todo生产者消费者模式">五、TODO　生产者消费者模式</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="前言">前言</h2>
+<p>最近需要在rust里面使用多进程，有进程锁是第一步，毕竟进入临界区不能裸奔。
+如果遥远的记忆没有出错，fcntl基于fd也可以实现进程锁，但是不是强制性的。所以这里选择有名信号量。</p>
+<h2 id="一有名信号量c语言函数原型">一、有名信号量<code>c</code>语言函数原型</h2>
+<h3 id="1sem_open函数">1.<code>sem_open()</code>函数</h3>
+<blockquote>
+<p>sem_open()  creates  a  new  POSIX  semaphore  or  opens  an  existing semaphore.  The semaphore is identified by name.  For details of the construction of name, see
+sem_overview(7).</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">sem_t</span> <span class="o">*</span><span class="nf">sem_open</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span> <span class="kt">int</span> <span class="n">oflag</span><span class="p">,</span> <span class="n">mode_t</span> <span class="n">mode</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">value</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>decrements (locks) the semaphore pointed to by sem.  If the semaphore&rsquo;s value is greater than zero, then the decrement proceeds, and the function returns,
+immediately.  If the semaphore currently has the value zero, then the call blocks until either it becomes possible to perform  the  decrement  (i.e.,  the  semaphore
+value rises above zero), or a signal handler interrupts the call.</p>
+</blockquote>
+<h3 id="2sem_wait函数">2.<code>sem_wait()</code>函数</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">sem_wait</span><span class="p">(</span><span class="n">sem_t</span> <span class="o">*</span><span class="n">sem</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>sem_post()  increments  (unlocks)  the  semaphore pointed to by sem.  If the semaphore&rsquo;s value consequently becomes greater than zero, then another process or thread
+blocked in a sem_wait(3) call will be woken up and proceed to lock the semaphore</p>
+</blockquote>
+<h3 id="3sem_post函数">3.<code>sem_post()</code>函数</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">sem_post</span><span class="p">(</span><span class="n">sem_t</span> <span class="o">*</span><span class="n">sem</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="二信号量原理">二、信号量原理</h2>
+<p>有名信号量的原理，类似如下伪代码，<code>wait()</code>函数发现资源分配完了，就会等待，<code>post()</code>函数的作用就是返还资源数，并且唤醒在<code>wait()</code>上等待的进程，或者线程。最后说下sem_open，最后一个参数可以指定资源数。资源数保证临界区同时有几个进程或者线程进入。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">sem</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">count</span> <span class="kt">int</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">sem</span><span class="p">)</span> <span class="nf">wait</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="nx">s</span><span class="p">.</span><span class="nx">count</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+	<span class="p">}</span>
+	<span class="nx">s</span><span class="p">.</span><span class="nx">count</span><span class="o">--</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">post</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1">// 1.累加
+</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nx">count</span><span class="o">++</span>
+	<span class="c1">// 2.唤醒等待的(线/进)程
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="三rust里面调用有名信号量">三、rust里面调用有名信号量</h2>
+<h3 id="1cargotoml配置">1.<code>Cargo.toml</code>配置</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-toml" data-lang="toml"><span class="p">[</span><span class="nx">dependencies</span><span class="p">]</span>
+<span class="nx">libc</span><span class="p">=</span><span class="s2">&#34;0.2&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="2rust里面调用有名信号量最小化example">2.rust里面调用有名信号量，最小化example</h3>
+<p>了解到原理，再使用sem就简单了，可以初始化资源数为1，然后使用wait和post包裹业务逻辑。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="k">use</span><span class="w"> </span><span class="n">libc</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">ffi</span>::<span class="n">CString</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CString</span>::<span class="n">new</span><span class="p">(</span><span class="s">&#34;asr.lock.dat&#34;</span><span class="p">).</span><span class="n">expect</span><span class="p">(</span><span class="s">&#34;CString::new failed&#34;</span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">        </span><span class="n">libc</span>::<span class="n">sem_unlink</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">as_ptr</span><span class="p">());</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 打开, 最后一个参数指定有一个进程可以进入临界区
+</span><span class="c1"></span><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">sem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">libc</span>::<span class="n">sem_open</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">as_ptr</span><span class="p">(),</span><span class="w"> </span><span class="n">libc</span>::<span class="n">O_CREAT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">libc</span>::<span class="n">O_EXCL</span><span class="p">,</span><span class="w"> </span><span class="mi">0644</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 申请，类似于lock
+</span><span class="c1"></span><span class="w">        </span><span class="n">libc</span>::<span class="n">sem_wait</span><span class="p">(</span><span class="n">sem</span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;hello&#34;</span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 归还，类似于unlock
+</span><span class="c1"></span><span class="w">        </span><span class="n">libc</span>::<span class="n">sem_post</span><span class="p">(</span><span class="n">sem</span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="n">libc</span>::<span class="n">sem_close</span><span class="p">(</span><span class="n">sem</span><span class="p">);</span><span class="w">
+</span><span class="w">    </span><span class="p">}</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="四测试进程锁">四、测试进程锁</h2>
+<h3 id="1cargotoml配置-1">1.<code>Cargo.toml</code>配置</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-toml" data-lang="toml"><span class="p">[</span><span class="nx">dependencies</span><span class="p">]</span>
+<span class="nx">nix</span> <span class="p">=</span> <span class="s2">&#34;0.16.1&#34;</span>
+<span class="nx">libc</span> <span class="p">=</span> <span class="s2">&#34;0.2&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="2测试代码">2.测试代码</h3>
+<p>测试代码会fork两个进程，对同一个文件，读里面数字，累加之后。再写回去。如果数字正常，说明没有问题。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="k">use</span><span class="w"> </span><span class="n">libc</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">nix</span>::<span class="n">unistd</span>::<span class="p">{</span><span class="n">fork</span><span class="p">,</span><span class="w"> </span><span class="n">ForkResult</span><span class="p">};</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">ffi</span>::<span class="n">CString</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">fs</span>::<span class="n">File</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">fs</span>::<span class="n">OpenOptions</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">io</span>::<span class="n">prelude</span>::<span class="o">*</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">io</span>::<span class="n">SeekFrom</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">add_num</span><span class="p">(</span><span class="n">file_name</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">lock</span>: <span class="o">*</span><span class="k">mut</span><span class="w"> </span><span class="n">libc</span>::<span class="n">sem_t</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 打开文件
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenOptions</span>::<span class="n">new</span><span class="p">()</span><span class="w">
+</span><span class="w">        </span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">
+</span><span class="w">        </span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">
+</span><span class="w">        </span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">
+</span><span class="w">        </span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span><span class="w">
+</span><span class="w">        </span><span class="p">.</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="p">..</span><span class="mi">2000</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 如果为lock第值为0就等待, 不为0减去1
+</span><span class="c1"></span><span class="w">        </span><span class="n">libc</span>::<span class="n">sem_wait</span><span class="p">(</span><span class="n">lock</span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 数据buffer
+</span><span class="c1"></span><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">new</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 设置文件指针到0号位置
+</span><span class="c1"></span><span class="w">        </span><span class="n">file</span><span class="p">.</span><span class="n">seek</span><span class="p">(</span><span class="n">SeekFrom</span>::<span class="n">Start</span><span class="p">(</span><span class="mi">0</span><span class="p">)).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 从文件读取到buffer里面
+</span><span class="c1"></span><span class="w">        </span><span class="n">file</span><span class="p">.</span><span class="n">read_to_string</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">buffer</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// buffer转成数字
+</span><span class="c1"></span><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">parse</span>::<span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span><span class="p">().</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 累加
+</span><span class="c1"></span><span class="w">        </span><span class="n">size</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 数字转成string
+</span><span class="c1"></span><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">to_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">format</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;{:04}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 偏移到文件指针0号位置
+</span><span class="c1"></span><span class="w">        </span><span class="n">file</span><span class="p">.</span><span class="n">seek</span><span class="p">(</span><span class="n">SeekFrom</span>::<span class="n">Start</span><span class="p">(</span><span class="mi">0</span><span class="p">)).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 写到文件里面
+</span><span class="c1"></span><span class="w">        </span><span class="n">file</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="o">&amp;</span><span class="n">to_data</span><span class="p">[..].</span><span class="n">as_bytes</span><span class="p">()).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// lock的值+1
+</span><span class="c1"></span><span class="w">        </span><span class="n">libc</span>::<span class="n">sem_post</span><span class="p">(</span><span class="n">lock</span><span class="p">);</span><span class="w">
+</span><span class="w">    </span><span class="p">}</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">file_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;./test.dat&#34;</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span>::<span class="n">create</span><span class="p">(</span><span class="n">file_name</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">    </span><span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="s">b&#34;0000&#34;</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 创建有名信号量字符串
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CString</span>::<span class="n">new</span><span class="p">(</span><span class="s">&#34;asr.lock.dat&#34;</span><span class="p">).</span><span class="n">expect</span><span class="p">(</span><span class="s">&#34;CString::new failed&#34;</span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">        </span><span class="n">libc</span>::<span class="n">sem_unlink</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">as_ptr</span><span class="p">());</span><span class="w">
+</span><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">libc</span>::<span class="n">sem_open</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">as_ptr</span><span class="p">(),</span><span class="w"> </span><span class="n">libc</span>::<span class="n">O_CREAT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">libc</span>::<span class="n">O_EXCL</span><span class="p">,</span><span class="w"> </span><span class="mi">0644</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="c1">// fork父子进程
+</span><span class="c1"></span><span class="w">        </span><span class="k">match</span><span class="w"> </span><span class="n">fork</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">            </span><span class="nb">Ok</span><span class="p">(</span><span class="n">ForkResult</span>::<span class="n">Parent</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">child</span><span class="p">,</span><span class="w"> </span><span class="p">..</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">                </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="w">
+</span><span class="w">                    </span><span class="s">&#34;Continuing execution in parent process, new child has pid: {}&#34;</span><span class="p">,</span><span class="w">
+</span><span class="w">                    </span><span class="n">child</span><span class="w">
+</span><span class="w">                </span><span class="p">);</span><span class="w">
+</span><span class="w">                </span><span class="n">add_num</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span><span class="w"> </span><span class="n">lock</span><span class="p">);</span><span class="w">
+</span><span class="w">            </span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span><span class="w">            </span><span class="nb">Ok</span><span class="p">(</span><span class="n">ForkResult</span>::<span class="n">Child</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">add_num</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span><span class="w"> </span><span class="n">lock</span><span class="p">),</span><span class="w">
+</span><span class="w">            </span><span class="nb">Err</span><span class="p">(</span><span class="n">_</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;Fork failed&#34;</span><span class="p">),</span><span class="w">
+</span><span class="w">        </span><span class="p">}</span><span class="w">
+</span><span class="w">    </span><span class="p">}</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="五todo生产者消费者模式">五、TODO　生产者消费者模式</h2>
+<p>TODO可以用sem完成生产者消费者模式练练手。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">guonaihong</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-12-25
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/rust/">rust</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/call-c-dynamic-library-in-rust-bingen-2/">
+            <span class="next-text nav-default">Call C Dynamic Library in Rust Bindgen 2</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="https://github.com/guonaihong" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020<span class="heart"><i class="iconfont icon-heart"></i></span><span>guonaihong</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

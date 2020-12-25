@@ -49,7 +49,7 @@
 <meta itemprop="description" content="前言 在Call C dynamic library in rust文章里面已经介绍了手动绑定c头文件到rust里面， 这下终于可以在rust里面使用c语言遗产。但是这里有个问题，">
 <meta itemprop="datePublished" content="2020-12-23T14:43:59+08:00" />
 <meta itemprop="dateModified" content="2020-12-23T14:43:59+08:00" />
-<meta itemprop="wordCount" content="1083">
+<meta itemprop="wordCount" content="1132">
 
 
 
@@ -152,10 +152,10 @@
             <li><a href="#4自动生成代码内容">4.自动生成代码内容</a></li>
           </ul>
         </li>
-        <li><a href="#四生成mod和编译依赖">四、生成mod和编译依赖</a>
+        <li><a href="#四创建mod和指定编译依赖">四、创建mod和指定编译依赖</a>
           <ul>
-            <li><a href="#1构建编译依赖">1.构建编译依赖</a></li>
-            <li><a href="#2把生成的rs文件变成模块">2.把生成的rs文件变成模块</a></li>
+            <li><a href="#1指定编译依赖">1.指定编译依赖</a></li>
+            <li><a href="#2创建mod">2.创建mod</a></li>
             <li><a href="#五运行">五、运行</a></li>
           </ul>
         </li>
@@ -299,8 +299,8 @@ extern &#34;C&#34; {
 
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="四生成mod和编译依赖">四、生成mod和编译依赖</h2>
-<h3 id="1构建编译依赖">1.构建编译依赖</h3>
+</div><h2 id="四创建mod和指定编译依赖">四、创建mod和指定编译依赖</h2>
+<h3 id="1指定编译依赖">1.指定编译依赖</h3>
 <p>如果熟悉c/c++就指定，编译动态库需要指定<code>-l</code>和<code>-L</code> 选项，一个指定动态库名称，一个指定动态库搜索路径。
 可以写<code>build.rs</code> build.rs是rust里面的编译脚本</p>
 <div class="highlight"><div class="chroma">
@@ -319,7 +319,8 @@ extern &#34;C&#34; {
 </span><span class="c1"></span><span class="p">}</span><span class="w">
 </span></code></pre></td></tr></table>
 </div>
-</div><h3 id="2把生成的rs文件变成模块">2.把生成的rs文件变成模块</h3>
+</div><h3 id="2创建mod">2.创建mod</h3>
+<p>这里使用lib.rs告知编译器，刚刚生成的binding.rs要当成模块。后面方便在main.rs里面调用。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -375,7 +376,11 @@ extern &#34;C&#34; {
           <a href="/tags/rust/">rust</a>
           </div>
       <nav class="post-nav">
-        
+        <a class="prev" href="/post/name-semaphore-as-process-lock/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Name Semaphore as Process Lock</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
         <a class="next" href="/post/call-c-dynamic-library-in-rust/">
             <span class="next-text nav-default">Call C dynamic library in rust</span>
             <span class="next-text nav-mobile">下一篇</span>
