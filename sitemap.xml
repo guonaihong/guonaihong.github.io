@@ -3,34 +3,41 @@
   
   <url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2020-12-25T15:31:11+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://localhost:1313/post/name-semaphore-as-process-lock/</loc>
-    <lastmod>2020-12-25T15:31:11+08:00</lastmod>
+    <lastmod>2020-12-28T13:45:06+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://localhost:1313/post/</loc>
-    <lastmod>2020-12-25T15:31:11+08:00</lastmod>
+    <lastmod>2020-12-28T13:45:06+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://localhost:1313/tags/rust/</loc>
-    <lastmod>2020-12-25T15:31:11+08:00</lastmod>
+    <lastmod>2020-12-28T13:45:06+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2020-12-28T13:45:06+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/post/wait-for-the-process-to-end/</loc>
+    <lastmod>2020-12-28T13:45:06+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/post/name-semaphore-as-process-lock/</loc>
     <lastmod>2020-12-25T15:31:11+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>

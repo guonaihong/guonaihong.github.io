@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Even - A super concise theme for Hugo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 25 Dec 2020 15:31:11 +0800</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 28 Dec 2020 13:45:06 +0800</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Wait for the Process to End</title>
+      <link>http://localhost:1313/post/wait-for-the-process-to-end/</link>
+      <pubDate>Mon, 28 Dec 2020 13:45:06 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/wait-for-the-process-to-end/</guid>
+      <description>一、前言 前面结束过使用fork()创建多个进程，使用sem_open(), sem_wait(), sem_post()保护临界区资源。 但是遗漏了一个重要的事情，如</description>
+    </item>
+    
     <item>
       <title>Name Semaphore as Process Lock</title>
       <link>http://localhost:1313/post/name-semaphore-as-process-lock/</link>

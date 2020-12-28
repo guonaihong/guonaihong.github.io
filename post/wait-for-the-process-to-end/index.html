@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Wait for the Process to End - Even - A super concise theme for Hugo</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="guonaihong" /><meta name="description" content="一、前言 前面结束过使用fork()创建多个进程，使用sem_open(), sem_wait(), sem_post()保护临界区资源。 但是遗漏了一个重要的事情，如" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/wait-for-the-process-to-end/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Wait for the Process to End" />
+<meta property="og:description" content="一、前言 前面结束过使用fork()创建多个进程，使用sem_open(), sem_wait(), sem_post()保护临界区资源。 但是遗漏了一个重要的事情，如" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/wait-for-the-process-to-end/" />
+<meta property="article:published_time" content="2020-12-28T13:45:06+08:00" />
+<meta property="article:modified_time" content="2020-12-28T13:45:06+08:00" />
+<meta itemprop="name" content="Wait for the Process to End">
+<meta itemprop="description" content="一、前言 前面结束过使用fork()创建多个进程，使用sem_open(), sem_wait(), sem_post()保护临界区资源。 但是遗漏了一个重要的事情，如">
+<meta itemprop="datePublished" content="2020-12-28T13:45:06+08:00" />
+<meta itemprop="dateModified" content="2020-12-28T13:45:06+08:00" />
+<meta itemprop="wordCount" content="827">
+
+
+
+<meta itemprop="keywords" content="rust," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Wait for the Process to End"/>
+<meta name="twitter:description" content="一、前言 前面结束过使用fork()创建多个进程，使用sem_open(), sem_wait(), sem_post()保护临界区资源。 但是遗漏了一个重要的事情，如"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">疯狂coding</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">疯狂coding</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Wait for the Process to End</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-12-28 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#一前言">一、前言</a></li>
+        <li><a href="#二演示父进程先结束">二、演示父进程先结束</a>
+          <ul>
+            <li><a href="#1cargotoml-配置">1.Cargo.toml 配置</a></li>
+            <li><a href="#2-父进程结束子进程不结束--最小化example">2. 父进程结束，子进程不结束&ndash;最小化example</a></li>
+          </ul>
+        </li>
+        <li><a href="#三父进程等待子进程先结束">三、父进程等待子进程先结束</a>
+          <ul>
+            <li><a href="#man-说明文档">man 说明文档</a></li>
+          </ul>
+        </li>
+        <li><a href="#四在rust实现erlang的哲学">四、在rust实现erlang的哲学</a>
+          <ul>
+            <li><a href="#1回顾下erlang的哲学">1.回顾下erlang的哲学</a></li>
+            <li><a href="#2解析erlang哲学">2.解析erlang哲学</a></li>
+            <li><a href="#3cargotoml">3.Cargo.toml</a></li>
+            <li><a href="#4任他奔溃工作者不成功便成仁">4.任他奔溃，工作者不成功，便成仁</a></li>
+            <li><a href="#5-ps命令测试">5. ps命令测试</a></li>
+            <li><a href="#6-还可以优化的地方">6. 还可以优化的地方</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="一前言">一、前言</h2>
+<p>前面结束过使用<code>fork()</code>创建多个进程，使用<code>sem_open()</code>, <code>sem_wait()</code>, <code>sem_post()</code>保护临界区资源。
+但是遗漏了一个重要的事情，如果调用<code>fork()</code>之后，父进程先结束了。本来要在父进程里面做些清理工作。这时候就尴尬了
+爸爸process没了，儿子process还在。</p>
+<h2 id="二演示父进程先结束">二、演示父进程先结束</h2>
+<h3 id="1cargotoml-配置">1.Cargo.toml 配置</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-toml" data-lang="toml"><span class="p">[</span><span class="nx">dependencies</span><span class="p">]</span>
+<span class="nx">nix</span> <span class="p">=</span> <span class="s2">&#34;0.16.1&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="2-父进程结束子进程不结束--最小化example">2. 父进程结束，子进程不结束&ndash;最小化example</h3>
+<p>下面的代码会先输出</p>
+<blockquote>
+<p>Continuing execution in parent process, new child has pid<br>
+bye bye main!</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="c1">//use nix::sys::wait;
+</span><span class="c1"></span><span class="k">use</span><span class="w"> </span><span class="n">nix</span>::<span class="n">unistd</span>::<span class="p">{</span><span class="n">fork</span><span class="p">,</span><span class="w"> </span><span class="n">ForkResult</span><span class="p">};</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="p">{</span><span class="n">thread</span><span class="p">,</span><span class="w"> </span><span class="n">time</span><span class="p">};</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="k">match</span><span class="w"> </span><span class="n">fork</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 父进程
+</span><span class="c1"></span><span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="n">ForkResult</span>::<span class="n">Parent</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">child</span><span class="p">,</span><span class="w"> </span><span class="p">..</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">            </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="w">
+</span><span class="w">                </span><span class="s">&#34;Continuing execution in parent process, new child has pid: {}&#34;</span><span class="p">,</span><span class="w">
+</span><span class="w">                </span><span class="n">child</span><span class="w">
+</span><span class="w">            </span><span class="p">);</span><span class="w">
+</span><span class="w">        </span><span class="p">}</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 子进程
+</span><span class="c1"></span><span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="n">ForkResult</span>::<span class="n">Child</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">time</span>::<span class="n">Duration</span>::<span class="n">from_secs</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w">
+</span><span class="w">            </span><span class="n">thread</span>::<span class="n">sleep</span><span class="p">(</span><span class="n">sec</span><span class="p">);</span><span class="w">
+</span><span class="w">            </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;I&#39;m a new child process&#34;</span><span class="p">)</span><span class="w">
+</span><span class="w">        </span><span class="p">}</span><span class="w">
+</span><span class="w">        </span><span class="nb">Err</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;Fork failed:{}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">err</span><span class="p">),</span><span class="w">
+</span><span class="w">    </span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">//match wait::wait() {
+</span><span class="c1"></span><span class="w">    </span><span class="c1">//    Ok(status) =&gt; println!(&#34;Child exited with status {:?}&#34;, status),
+</span><span class="c1"></span><span class="w">    </span><span class="c1">//    Err(err) =&gt; panic!(&#34;waitpid() failed: {}&#34;, err),
+</span><span class="c1"></span><span class="w">    </span><span class="c1">//}
+</span><span class="c1"></span><span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;bye bye main !&#34;</span><span class="p">)</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="三父进程等待子进程先结束">三、父进程等待子进程先结束</h2>
+<p>要变成父进程等待子进程结束然后退出。只要把上面的注释去掉就行。这里揭晓下谜底<code>wait()</code> system call</p>
+<h3 id="man-说明文档">man 说明文档</h3>
+<blockquote>
+<p>The wait() system call suspends execution of the calling process until one of its children terminates.  The call wait(&amp;wstatus) is equivalent to:</p>
+</blockquote>
+<blockquote>
+<p>waitpid(-1, &amp;wstatus, 0);</p>
+</blockquote>
+<h2 id="四在rust实现erlang的哲学">四、在rust实现erlang的哲学</h2>
+<p>已经有fork和wait，我们也许可以实现下erlang的哲学理念.</p>
+<h3 id="1回顾下erlang的哲学">1.回顾下erlang的哲学</h3>
+<ol>
+<li>
+<p>让其它进程来修复错误。</p>
+</li>
+<li>
+<p>工作者不成功，便成仁。（if you can’t do what you want to do, die.）</p>
+</li>
+<li>
+<p>任它崩溃。</p>
+</li>
+<li>
+<p>杜绝防御式编程。</p>
+</li>
+</ol>
+<h3 id="2解析erlang哲学">2.解析erlang哲学</h3>
+<p>第一点可以理解为，如果监控到work进程崩溃，fork新的work 进程继续干活。2,3,4只是一个态度，好办.</p>
+<h3 id="3cargotoml">3.Cargo.toml</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-toml" data-lang="toml"><span class="p">[</span><span class="nx">dependencies</span><span class="p">]</span>
+<span class="nx">nix</span> <span class="p">=</span> <span class="s2">&#34;0.16.1&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="4任他奔溃工作者不成功便成仁">4.任他奔溃，工作者不成功，便成仁</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="k">use</span><span class="w"> </span><span class="n">nix</span>::<span class="n">sys</span>::<span class="n">wait</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">nix</span>::<span class="n">unistd</span>::<span class="p">{</span><span class="n">fork</span><span class="p">,</span><span class="w"> </span><span class="n">ForkResult</span><span class="p">};</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="p">{</span><span class="n">thread</span><span class="p">,</span><span class="w"> </span><span class="n">time</span><span class="p">};</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">fn</span> <span class="nf">proc_new</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="k">match</span><span class="w"> </span><span class="n">fork</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 父进程
+</span><span class="c1"></span><span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="n">ForkResult</span>::<span class="n">Parent</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">child</span><span class="p">,</span><span class="w"> </span><span class="p">..</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">            </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="w">
+</span><span class="w">                </span><span class="s">&#34;Continuing execution in parent process, new child has pid: {}&#34;</span><span class="p">,</span><span class="w">
+</span><span class="w">                </span><span class="n">child</span><span class="w">
+</span><span class="w">            </span><span class="p">);</span><span class="w">
+</span><span class="w">        </span><span class="p">}</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 子进程
+</span><span class="c1"></span><span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="n">ForkResult</span>::<span class="n">Child</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">time</span>::<span class="n">Duration</span>::<span class="n">from_secs</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span><span class="w">
+</span><span class="w">            </span><span class="n">thread</span>::<span class="n">sleep</span><span class="p">(</span><span class="n">sec</span><span class="p">);</span><span class="w">
+</span><span class="w">            </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;I&#39;m a new child process&#34;</span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w">            </span><span class="c1">// 模拟coredump　或者段错误
+</span><span class="c1"></span><span class="w">            </span><span class="n">panic</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;child process dead&#34;</span><span class="p">);</span><span class="w">
+</span><span class="w">        </span><span class="p">}</span><span class="w">
+</span><span class="w">        </span><span class="nb">Err</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;Fork failed:{}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">err</span><span class="p">),</span><span class="w">
+</span><span class="w">    </span><span class="p">}</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="n">proc_new</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 监控子进程状态
+</span><span class="c1"></span><span class="w">    </span><span class="k">loop</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">        </span><span class="k">match</span><span class="w"> </span><span class="n">wait</span>::<span class="n">wait</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">            </span><span class="nb">Ok</span><span class="p">(</span><span class="n">status</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">                </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;Child exited with status {:?}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">);</span><span class="w">
+</span><span class="w">                </span><span class="n">proc_new</span><span class="p">();</span><span class="w">
+</span><span class="w">            </span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span><span class="w">            </span><span class="nb">Err</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">panic</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;waitpid() failed: {}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">err</span><span class="p">),</span><span class="w">
+</span><span class="w">        </span><span class="p">}</span><span class="w">
+</span><span class="w">    </span><span class="p">}</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="5-ps命令测试">5. ps命令测试</h3>
+<p>撸码的最后一个环境是测试。这里使用``ps```测试以上代码是否都保持在2个进程</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">s aux <span class="p">|</span>grep use_
+<span class="c1"># 输出</span>
+<span class="c1"># guo      12288  0.0  0.0  13304  1012 pts/3    S+   14:44   0:00 ./target/debug/use_fork_wait</span>
+<span class="c1"># guo      12297  0.0  0.0  13304   136 pts/3    S+   14:45   0:00 ./target/debug/use_fork_wait</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="6-还可以优化的地方">6. 还可以优化的地方</h3>
+<p>使用<code>wait()</code> 监控子进程状态，然后fork进程，这里根据错误数设计滑动窗口，削峰填谷。解决系统的抖动。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">guonaihong</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-12-28
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/rust/">rust</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/name-semaphore-as-process-lock/">
+            <span class="next-text nav-default">Name Semaphore as Process Lock</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="https://github.com/guonaihong" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020<span class="heart"><i class="iconfont icon-heart"></i></span><span>guonaihong</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
