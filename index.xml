@@ -6,7 +6,16 @@
     <description>Recent content on Even - A super concise theme for Hugo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 28 Dec 2020 13:45:06 +0800</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 29 Dec 2020 13:05:58 +0800</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>rust 泛型函数笔记-Rust Generics Func</title>
+      <link>http://localhost:1313/post/rust-generics-func/</link>
+      <pubDate>Tue, 29 Dec 2020 13:05:58 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/rust-generics-func/</guid>
+      <description>一、泛型概念 泛型很多编程语言都会实现的特性。在处理数据结构的时候可以带来很大便利性。或者一些工具函数可以处理多种类型。 当然熟悉go的童鞋，可</description>
+    </item>
+    
     <item>
       <title>Wait for the Process to End</title>
       <link>http://localhost:1313/post/wait-for-the-process-to-end/</link>

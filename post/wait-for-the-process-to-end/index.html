@@ -49,7 +49,7 @@
 <meta itemprop="description" content="一、前言 前面结束过使用fork()创建多个进程，使用sem_open(), sem_wait(), sem_post()保护临界区资源。 但是遗漏了一个重要的事情，如">
 <meta itemprop="datePublished" content="2020-12-28T13:45:06+08:00" />
 <meta itemprop="dateModified" content="2020-12-28T13:45:06+08:00" />
-<meta itemprop="wordCount" content="827">
+<meta itemprop="wordCount" content="834">
 
 
 
@@ -157,6 +157,7 @@
             <li><a href="#6-还可以优化的地方">6. 还可以优化的地方</a></li>
           </ul>
         </li>
+        <li><a href="#五参考资料">五、参考资料</a></li>
       </ul>
     </li>
   </ul>
@@ -396,6 +397,8 @@ bye bye main!</p>
 </div>
 </div><h3 id="6-还可以优化的地方">6. 还可以优化的地方</h3>
 <p>使用<code>wait()</code> 监控子进程状态，然后fork进程，这里根据错误数设计滑动窗口，削峰填谷。解决系统的抖动。</p>
+<h2 id="五参考资料">五、参考资料</h2>
+<p><a href="https://iximiuz.com/en/posts/dealing-with-processes-termination-in-Linux/">https://iximiuz.com/en/posts/dealing-with-processes-termination-in-Linux/</a></p>
 
     </div>
 
@@ -419,7 +422,11 @@ bye bye main!</p>
           <a href="/tags/rust/">rust</a>
           </div>
       <nav class="post-nav">
-        
+        <a class="prev" href="/post/rust-generics-func/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">rust 泛型函数笔记-Rust Generics Func</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
         <a class="next" href="/post/name-semaphore-as-process-lock/">
             <span class="next-text nav-default">Name Semaphore as Process Lock</span>
             <span class="next-text nav-mobile">下一篇</span>

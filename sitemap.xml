@@ -3,28 +3,42 @@
   
   <url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2020-12-28T13:45:06+08:00</lastmod>
+    <lastmod>2020-12-29T13:05:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://localhost:1313/post/</loc>
-    <lastmod>2020-12-28T13:45:06+08:00</lastmod>
+    <lastmod>2020-12-29T13:05:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://localhost:1313/tags/rust/</loc>
-    <lastmod>2020-12-28T13:45:06+08:00</lastmod>
+    <lastmod>2020-12-29T13:05:58+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/post/rust-generics-func/</loc>
+    <lastmod>2020-12-29T13:05:58+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/tags/rust-generics/</loc>
+    <lastmod>2020-12-29T13:05:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://localhost:1313/tags/</loc>
-    <lastmod>2020-12-28T13:45:06+08:00</lastmod>
+    <lastmod>2020-12-29T13:05:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
