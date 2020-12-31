@@ -3,14 +3,42 @@
   
   <url>
     <loc>http://localhost:1313/post/</loc>
-    <lastmod>2020-12-29T13:05:58+08:00</lastmod>
+    <lastmod>2020-12-30T14:51:29+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://localhost:1313/tags/rust/</loc>
-    <lastmod>2020-12-29T13:05:58+08:00</lastmod>
+    <lastmod>2020-12-30T14:51:29+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/post/rust-tcp-client-and-server-template/</loc>
+    <lastmod>2020-12-30T14:51:29+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2020-12-30T14:51:29+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/tags/tcp/</loc>
+    <lastmod>2020-12-30T14:51:29+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/</loc>
+    <lastmod>2020-12-30T14:51:29+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -24,20 +52,6 @@
   
   <url>
     <loc>http://localhost:1313/tags/rust-generics/</loc>
-    <lastmod>2020-12-29T13:05:58+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://localhost:1313/tags/</loc>
-    <lastmod>2020-12-29T13:05:58+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://localhost:1313/</loc>
     <lastmod>2020-12-29T13:05:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>

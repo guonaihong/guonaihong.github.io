@@ -6,6 +6,7 @@
     <description>Recent content in rust-generics on 疯狂coding</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
+    <copyright>guonaihong</copyright>
     <lastBuildDate>Tue, 29 Dec 2020 13:05:58 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/rust-generics/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>rust 泛型函数笔记-Rust Generics Func</title>
