@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>guonaihong</copyright>
-    <lastBuildDate>Wed, 30 Dec 2020 14:51:29 +0800</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 04 Jan 2021 16:35:27 +0800</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tcp Protobuf and Server</title>
+      <link>http://localhost:1313/post/tcp-protobuf-and-server/</link>
+      <pubDate>Mon, 04 Jan 2021 16:35:27 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/tcp-protobuf-and-server/</guid>
+      <description>前言 在tcp使用可扩展的私有协议，通常使用TLV(length type value)设计方式。L解决TCP粘包问题。TV提供扩展能力。接下来本笔记使</description>
+    </item>
+    
     <item>
       <title>rust tcp模板代码--Rust Tcp Client and Server Template</title>
       <link>http://localhost:1313/post/rust-tcp-client-and-server-template/</link>

@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Tcp Protobuf and Server - 疯狂coding</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="guonaihong" /><meta name="description" content="前言 在tcp使用可扩展的私有协议，通常使用TLV(length type value)设计方式。L解决TCP粘包问题。TV提供扩展能力。接下来本笔记使" /><meta name="keywords" content="rust, go, vim" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/tcp-protobuf-and-server/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Tcp Protobuf and Server" />
+<meta property="og:description" content="前言 在tcp使用可扩展的私有协议，通常使用TLV(length type value)设计方式。L解决TCP粘包问题。TV提供扩展能力。接下来本笔记使" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/tcp-protobuf-and-server/" />
+<meta property="article:published_time" content="2021-01-04T16:35:27+08:00" />
+<meta property="article:modified_time" content="2021-01-04T16:35:27+08:00" />
+<meta itemprop="name" content="Tcp Protobuf and Server">
+<meta itemprop="description" content="前言 在tcp使用可扩展的私有协议，通常使用TLV(length type value)设计方式。L解决TCP粘包问题。TV提供扩展能力。接下来本笔记使">
+<meta itemprop="datePublished" content="2021-01-04T16:35:27+08:00" />
+<meta itemprop="dateModified" content="2021-01-04T16:35:27+08:00" />
+<meta itemprop="wordCount" content="1611">
+
+
+
+<meta itemprop="keywords" content="rust,tcp,protobuf," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Tcp Protobuf and Server"/>
+<meta name="twitter:description" content="前言 在tcp使用可扩展的私有协议，通常使用TLV(length type value)设计方式。L解决TCP粘包问题。TV提供扩展能力。接下来本笔记使"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">疯狂coding</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">疯狂coding</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Tcp Protobuf and Server</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-01-04 </span>
+        
+          <span class="more-meta"> 约 1611 字 </span>
+          <span class="more-meta"> 预计阅读 4 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#前言">前言</a></li>
+        <li><a href="#一创建工程">一、创建工程</a></li>
+        <li><a href="#二实现length加头和去头工具函数">二、实现length加头和去头工具函数</a>
+          <ul>
+            <li><a href="#1实现">1.实现</a></li>
+            <li><a href="#2修改librs">2.修改<code>lib.rs</code></a></li>
+          </ul>
+        </li>
+        <li><a href="#三使用protobuf">三、使用<code>protobuf</code></a>
+          <ul>
+            <li><a href="#1定义protobuf文件">1.定义<code>protobuf</code>文件</a></li>
+            <li><a href="#2编写buildrs-编译脚步">2.编写<code>build.rs</code> 编译脚步</a></li>
+            <li><a href="#3修改cargotoml">3.修改<code>Cargo.toml</code></a></li>
+            <li><a href="#4告知编译器">4.告知编译器</a></li>
+          </ul>
+        </li>
+        <li><a href="#四实现客户端代码-clientrs">四、实现客户端代码 <code>client.rs</code></a>
+          <ul>
+            <li></li>
+          </ul>
+        </li>
+        <li><a href="#五实现服务端">五、实现服务端</a></li>
+        <li><a href="#六完整的cargotoml">六、完整的<code>Cargo.toml</code></a></li>
+        <li><a href="#七运行">七、运行</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="前言">前言</h2>
+<p>在tcp使用可扩展的私有协议，通常使用TLV(length type value)设计方式。L解决TCP粘包问题。TV提供扩展能力。接下来本笔记使用TV使用protobuf实现。
+protobuf已经成为TV的事实标准，作为开发人员的瑞士军刀就不需要再作过多描述。</p>
+<h2 id="一创建工程">一、创建工程</h2>
+<p>创建一个名为tcp-protobuf-and-server的rust工程目录</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">cargo new tcp-protobuf-and-server --bin
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="二实现length加头和去头工具函数">二、实现length加头和去头工具函数</h2>
+<h3 id="1实现">1.实现</h3>
+<ul>
+<li>位于src/utils.rs</li>
+<li><code>write_head_and_bytes</code> 先向<code>TcpStream</code>写入数据头，再写入数据payload</li>
+<li><code>read_head_and_bytes</code> 先读取<code>4</code>字节定长数据，再读取数据</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">io</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">io</span>::<span class="p">{</span><span class="n">Read</span><span class="p">,</span><span class="w"> </span><span class="n">Write</span><span class="p">};</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">net</span>::<span class="n">TcpStream</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">write_head_and_bytes</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">stream</span>: <span class="kp">&amp;</span><span class="nc">TcpStream</span><span class="p">,</span><span class="w"> </span><span class="n">data</span>: <span class="kp">&amp;</span><span class="p">[</span><span class="kt">u8</span><span class="p">])</span><span class="w"> </span>-&gt; <span class="nc">io</span>::<span class="nb">Result</span><span class="o">&lt;</span><span class="p">()</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 存放头
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">).</span><span class="n">to_be_bytes</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 写入头
+</span><span class="c1"></span><span class="w">    </span><span class="n">stream</span><span class="p">.</span><span class="n">write_all</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buffer</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 写入body
+</span><span class="c1"></span><span class="w">    </span><span class="n">stream</span><span class="p">.</span><span class="n">write_all</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="nb">Ok</span><span class="p">(())</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">read_head_and_bytes</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">stream</span>: <span class="kp">&amp;</span><span class="nc">TcpStream</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">io</span>::<span class="nb">Result</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">u8</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="k">u8</span><span class="p">;</span><span class="w"> </span><span class="mi">4</span><span class="p">];</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 读取4个字节定长数据
+</span><span class="c1"></span><span class="w">    </span><span class="n">stream</span><span class="p">.</span><span class="n">read_exact</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">buffer</span><span class="p">[..])</span><span class="o">?</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 计算buffer长度
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">u32</span>::<span class="n">from_be_bytes</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 数据body
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">];</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 读取数据body
+</span><span class="c1"></span><span class="w">    </span><span class="n">stream</span><span class="p">.</span><span class="n">read_exact</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">payload</span><span class="p">[..])</span><span class="o">?</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="nb">Ok</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2修改librs">2.修改<code>lib.rs</code></h3>
+<p>把utils.rs添加到模块里面，rust编译器有点懒，要编译的模块一个要告知，比如注册到<code>lib.rs</code>。不像go放到目录里面就给编译</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">echo</span> <span class="s1">&#39;pub mod utils;&#39;</span> &gt;&gt; src/lib.rs
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="三使用protobuf">三、使用<code>protobuf</code></h2>
+<h3 id="1定义protobuf文件">1.定义<code>protobuf</code>文件</h3>
+<p>位于<code>protos/small-model.proto</code> 位置，这里使用protobuf3的语法，可以看到<code>syntax = &quot;proto3&quot;;</code> 这行&quot;</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">syntax = &#34;proto3&#34;;
+
+message HotWordRequest {
+    string model_type = 1;
+    string model_text=2;
+    string session_id = 3;
+}
+
+message HotWordResponse {
+    int64 errcode = 1;
+    string errmsg = 2;
+    string session_id = 3;
+    bytes gen_model=4;
+}
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="2编写buildrs-编译脚步">2.编写<code>build.rs</code> 编译脚步</h3>
+<p>在很多编译语言，一般使用命令生成protobuf代码，rust默认里面使用<code>build.rs</code>，好处是修改protobuf文件，不会产生忘了重新生成代码的尴尬。
+<code>.out_dir</code>指定代码生成位置。<code>.inputs</code>指定.proto文件位置。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="n">protobuf_codegen_pure</span>::<span class="n">Codegen</span>::<span class="n">new</span><span class="p">()</span><span class="w">
+</span><span class="w">        </span><span class="p">.</span><span class="n">out_dir</span><span class="p">(</span><span class="s">&#34;src/protos&#34;</span><span class="p">)</span><span class="w">
+</span><span class="w">        </span><span class="p">.</span><span class="n">inputs</span><span class="p">(</span><span class="o">&amp;</span><span class="p">[</span><span class="s">&#34;protos/small-model.proto&#34;</span><span class="p">])</span><span class="w">
+</span><span class="w">        </span><span class="p">.</span><span class="n">include</span><span class="p">(</span><span class="s">&#34;protos&#34;</span><span class="p">)</span><span class="w">
+</span><span class="w">        </span><span class="p">.</span><span class="n">run</span><span class="p">()</span><span class="w">
+</span><span class="w">        </span><span class="p">.</span><span class="n">expect</span><span class="p">(</span><span class="s">&#34;Codegen failed.&#34;</span><span class="p">);</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3修改cargotoml">3.修改<code>Cargo.toml</code></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-toml" data-lang="toml"><span class="p">[</span><span class="nx">build</span><span class="err">-</span><span class="nx">dependencies</span><span class="p">]</span>
+<span class="nx">protobuf</span><span class="err">-</span><span class="nx">codegen</span><span class="err">-</span><span class="nx">pure</span> <span class="p">=</span> <span class="s2">&#34;2.14&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="4告知编译器">4.告知编译器</h3>
+<h4 id="41-修改librs">4.1 修改<code>lib.rs</code></h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">echo</span> <span class="s1">&#39;pub mod protos;&#39;</span> &gt;&gt; src/lib.rs
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="42在protos目录添加modrs">4.2在<code>protos</code>目录添加<code>mod.rs</code></h4>
+<ul>
+<li>创建mod.rs</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">vim src/protos/mod.rs
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>加入以下内容</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="k">pub</span><span class="w"> </span><span class="k">mod</span> <span class="nn">small_model</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">use</span><span class="w"> </span><span class="n">small_model</span>::<span class="p">{</span><span class="n">HotWordRequest</span><span class="p">,</span><span class="w"> </span><span class="n">HotWordResponse</span><span class="p">};</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="四实现客户端代码-clientrs">四、实现客户端代码 <code>client.rs</code></h2>
+<h4 id="1-使用protobuf文件">1. 使用protobuf文件</h4>
+<p>这里使用绝对路径引入模块，回到第一条，<code> cargo new tcp-protobuf-and-server --bin</code>创建工程，
+在rust里面的包名，如果有中横岗<code>-</code>必须要换成<code>_</code>下滑线</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="k">use</span><span class="w"> </span><span class="n">tcp_protobuf_and_server</span>::<span class="n">protos</span>::<span class="n">small_model</span>::<span class="o">*</span><span class="p">;</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>创建请求结构体, <code>xxx::new</code>，这里的xxx是<code>small-model.proto</code> 里面定义的message名</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">req</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HotWordRequest</span>::<span class="n">new</span><span class="p">();</span><span class="w">
+</span><span class="w">    </span><span class="n">req</span><span class="p">.</span><span class="n">model_text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">data</span><span class="p">;</span><span class="w">
+</span><span class="w">    </span><span class="n">req</span><span class="p">.</span><span class="n">model_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="2-protobuf结构体序列化">2. <code>protobuf</code>结构体序列化</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="kd">let</span><span class="w"> </span><span class="n">out_req</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">write_to_bytes</span><span class="p">().</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="3-protobuf结构体反序列化">3. <code>protobuf</code>结构体反序列化</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="kd">let</span><span class="w"> </span><span class="n">rsp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">protobuf</span>::<span class="n">parse_from_bytes</span>::<span class="o">&lt;</span><span class="n">HotWordResponse</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">payload</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="4-完整代码如下">4. 完整代码如下</h4>
+<p><code>src/client.rs</code> 内容如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="k">use</span><span class="w"> </span><span class="n">protobuf</span>::<span class="n">Message</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">net</span>::<span class="n">TcpStream</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">structopt</span>::<span class="n">StructOpt</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">tcp_protobuf_and_server</span>::<span class="n">protos</span>::<span class="n">small_model</span>::<span class="o">*</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">tcp_protobuf_and_server</span>::<span class="n">utils</span>::<span class="o">*</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="cp">#[derive(StructOpt, Debug)]</span><span class="w">
+</span><span class="w"></span><span class="k">struct</span> <span class="nc">Client</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="sd">/// tcp server address
+</span><span class="sd"></span><span class="w">    </span><span class="cp">#[structopt(short, long)]</span><span class="w">
+</span><span class="w">    </span><span class="n">addr</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="sd">/// data
+</span><span class="sd"></span><span class="w">    </span><span class="cp">#[structopt(short, long)]</span><span class="w">
+</span><span class="w">    </span><span class="n">data</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="sd">/// hotword
+</span><span class="sd"></span><span class="w">    </span><span class="cp">#[structopt(short, long)]</span><span class="w">
+</span><span class="w">    </span><span class="n">hot_world</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="sd">/// grammar
+</span><span class="sd"></span><span class="w">    </span><span class="cp">#[structopt(short, long)]</span><span class="w">
+</span><span class="w">    </span><span class="n">grammar</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="sd">/// small model
+</span><span class="sd"></span><span class="w">    </span><span class="cp">#[structopt(short, long)]</span><span class="w">
+</span><span class="w">    </span><span class="n">small_model</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 解析命令行
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Client</span>::<span class="n">from_args</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">t</span>: <span class="nb">String</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">hot_world</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">        </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;hot_world&#34;</span><span class="p">.</span><span class="n">to_string</span><span class="p">();</span><span class="w">
+</span><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">grammar</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">        </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;grammar&#34;</span><span class="p">.</span><span class="n">to_string</span><span class="p">();</span><span class="w">
+</span><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">small_model</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">        </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;small_model&#34;</span><span class="p">.</span><span class="n">to_string</span><span class="p">();</span><span class="w">
+</span><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">        </span><span class="n">panic</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;hotword(false), grammar(false), small-model(false)&#34;</span><span class="p">);</span><span class="w">
+</span><span class="w">    </span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">req</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HotWordRequest</span>::<span class="n">new</span><span class="p">();</span><span class="w">
+</span><span class="w">    </span><span class="n">req</span><span class="p">.</span><span class="n">model_text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">data</span><span class="p">;</span><span class="w">
+</span><span class="w">    </span><span class="n">req</span><span class="p">.</span><span class="n">model_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 0.protobuf结构体转成bytes
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">out_req</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">write_to_bytes</span><span class="p">().</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 1.连接服务端
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TcpStream</span>::<span class="n">connect</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">addr</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 2.写入数据，并加4个字节的头
+</span><span class="c1"></span><span class="w">    </span><span class="n">write_head_and_bytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">out_req</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 3.读取TLV数据，提取V
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">read_head_and_bytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 4.解析payload 到protobuf结构体里面
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">rsp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">protobuf</span>::<span class="n">parse_from_bytes</span>::<span class="o">&lt;</span><span class="n">HotWordResponse</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">payload</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 5.读取rsp结构体里面数据
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">gen_model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rsp</span><span class="p">.</span><span class="n">get_gen_model</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 6.写入到终端
+</span><span class="c1"></span><span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;payload:{}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">std</span>::<span class="kt">str</span>::<span class="n">from_utf8</span><span class="p">(</span><span class="o">&amp;</span><span class="n">gen_model</span><span class="p">).</span><span class="n">unwrap</span><span class="p">());</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="五实现服务端">五、实现服务端</h2>
+<p><code>src/server.rs</code>内容
+服务端和客户端大同小异，不作展开</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="k">use</span><span class="w"> </span><span class="n">protobuf</span>::<span class="n">Message</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">io</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">net</span>::<span class="p">{</span><span class="n">TcpListener</span><span class="p">,</span><span class="w"> </span><span class="n">TcpStream</span><span class="p">};</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">structopt</span>::<span class="n">StructOpt</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">tcp_protobuf_and_server</span>::<span class="n">protos</span>::<span class="n">small_model</span>::<span class="o">*</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">tcp_protobuf_and_server</span>::<span class="n">utils</span>::<span class="o">*</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="cp">#[derive(StructOpt, Debug)]</span><span class="w">
+</span><span class="w"></span><span class="k">struct</span> <span class="nc">Server</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="sd">/// server address
+</span><span class="sd"></span><span class="w">    </span><span class="cp">#[structopt(short, long)]</span><span class="w">
+</span><span class="w">    </span><span class="n">server_addr</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">fn</span> <span class="nf">work_conn</span><span class="p">(</span><span class="n">stream</span>: <span class="nc">TcpStream</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">io</span>::<span class="nb">Result</span><span class="o">&lt;</span><span class="p">()</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 0.读取TLV数据，提取data
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">read_head_and_bytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 1.解析protobuf数据到结构体
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">req</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">protobuf</span>::<span class="n">parse_from_bytes</span>::<span class="o">&lt;</span><span class="n">HotWordRequest</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">payload</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 2.获取请求参数
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">model_text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">get_model_text</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 3.追加一些数据，然后返回
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">rsp_model_text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">format</span><span class="o">!</span><span class="p">(</span><span class="w">
+</span><span class="w">        </span><span class="s">&#34;#Server read &lt;client data:{}&gt; &lt;client type:{}&gt;&#34;</span><span class="p">,</span><span class="w">
+</span><span class="w">        </span><span class="n">model_text</span><span class="p">,</span><span class="w">
+</span><span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">get_model_type</span><span class="p">()</span><span class="w">
+</span><span class="w">    </span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 4.声明响应
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">rsp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HotWordResponse</span>::<span class="n">new</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 5.设置回写数据
+</span><span class="c1"></span><span class="w">    </span><span class="n">rsp</span><span class="p">.</span><span class="n">set_gen_model</span><span class="p">(</span><span class="n">rsp_model_text</span><span class="p">.</span><span class="n">as_bytes</span><span class="p">().</span><span class="n">to_vec</span><span class="p">());</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 6.protobuf 结构体转成bytes
+</span><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">out_rsp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rsp</span><span class="p">.</span><span class="n">write_to_bytes</span><span class="p">().</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c1">// 7.写入客户端
+</span><span class="c1"></span><span class="w">    </span><span class="n">write_head_and_bytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">out_rsp</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
+</span><span class="w">    </span><span class="nb">Ok</span><span class="p">(())</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">impl</span><span class="w"> </span><span class="n">Server</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="k">fn</span> <span class="nf">main_loop</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">        </span><span class="c1">// 创建listen
+</span><span class="c1"></span><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">listener</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TcpListener</span>::<span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">.</span><span class="n">server_addr</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">listener</span><span class="p">.</span><span class="n">incoming</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">                </span><span class="nb">Ok</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">stream</span><span class="p">,</span><span class="w">
+</span><span class="w">                </span><span class="nb">Err</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">                    </span><span class="cm">/* connection failed */</span><span class="w">
+</span><span class="w">                    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&#34;{:#?}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span><span class="w">
+</span><span class="w">                    </span><span class="k">continue</span><span class="p">;</span><span class="w">
+</span><span class="w">                </span><span class="p">}</span><span class="w">
+</span><span class="w">            </span><span class="p">};</span><span class="w">
+</span><span class="w">
+</span><span class="w">            </span><span class="n">work_conn</span><span class="p">(</span><span class="n">stream</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span><span class="w">        </span><span class="p">}</span><span class="w">
+</span><span class="w">    </span><span class="p">}</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Server</span>::<span class="n">from_args</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="n">s</span><span class="p">.</span><span class="n">main_loop</span><span class="p">();</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="六完整的cargotoml">六、完整的<code>Cargo.toml</code></h2>
+<p>如果要在rust工程编译多个可执行文件，可以使用<code>[[bin]]</code>标记
+下面的配置，可以同时编译<code>client</code>和<code>server</code>两个可执行文件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-toml" data-lang="toml"><span class="p">[</span><span class="nx">package</span><span class="p">]</span>
+<span class="nx">name</span> <span class="p">=</span> <span class="s2">&#34;tcp-protobuf-and-server&#34;</span>
+<span class="nx">version</span> <span class="p">=</span> <span class="s2">&#34;0.1.0&#34;</span>
+<span class="nx">authors</span> <span class="p">=</span> <span class="p">[</span><span class="s2">&#34;guonaihong &lt;guonaihong@qq.com&gt;&#34;</span><span class="p">]</span>
+<span class="nx">edition</span> <span class="p">=</span> <span class="s2">&#34;2018&#34;</span>
+
+<span class="c"># See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html</span>
+
+<span class="p">[[</span><span class="nx">bin</span><span class="p">]]</span>
+<span class="nx">name</span><span class="p">=</span><span class="s2">&#34;client&#34;</span>
+<span class="nx">path</span><span class="p">=</span><span class="s2">&#34;./src/client.rs&#34;</span>
+
+<span class="p">[[</span><span class="nx">bin</span><span class="p">]]</span>
+<span class="nx">name</span><span class="p">=</span><span class="s2">&#34;server&#34;</span>
+<span class="nx">path</span><span class="p">=</span><span class="s2">&#34;./src/server.rs&#34;</span>
+
+<span class="p">[</span><span class="nx">build</span><span class="err">-</span><span class="nx">dependencies</span><span class="p">]</span>
+<span class="nx">protobuf</span><span class="err">-</span><span class="nx">codegen</span><span class="err">-</span><span class="nx">pure</span> <span class="p">=</span> <span class="s2">&#34;2.14&#34;</span>
+
+<span class="p">[</span><span class="nx">dependencies</span><span class="p">]</span>
+<span class="nx">protobuf</span> <span class="p">=</span> <span class="s2">&#34;2.9&#34;</span>
+<span class="nx">structopt</span> <span class="p">=</span> <span class="s2">&#34;0.3&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="七运行">七、运行</h2>
+<ul>
+<li>运行服务端</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">./target/debug/server -s <span class="s2">&#34;0:8888&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>运行客户端</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">./target/debug/client -g -a <span class="s2">&#34;0:8888&#34;</span> -d <span class="s2">&#34;test word&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">guonaihong</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2021-01-04
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/rust/">rust</a>
+          <a href="/tags/tcp/">tcp</a>
+          <a href="/tags/protobuf/">protobuf</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/rust-tcp-client-and-server-template/">
+            <span class="next-text nav-default">rust tcp模板代码--Rust Tcp Client and Server Template</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="https://github.com/guonaihong" class="iconfont icon-github" title="github"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2020 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>guonaihong</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
