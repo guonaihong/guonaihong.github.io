@@ -49,7 +49,7 @@
 <meta itemprop="description" content="前言 在tcp使用可扩展的私有协议，通常使用TLV(length type value)设计方式。L解决TCP粘包问题。TV提供扩展能力。接下来本笔记使">
 <meta itemprop="datePublished" content="2021-01-04T16:35:27+08:00" />
 <meta itemprop="dateModified" content="2021-01-04T16:35:27+08:00" />
-<meta itemprop="wordCount" content="1611">
+<meta itemprop="wordCount" content="1624">
 
 
 
@@ -124,7 +124,7 @@
       <div class="post-meta">
         <span class="post-time"> 2021-01-04 </span>
         
-          <span class="more-meta"> 约 1611 字 </span>
+          <span class="more-meta"> 约 1624 字 </span>
           <span class="more-meta"> 预计阅读 4 分钟 </span>
         
       </div>
@@ -148,7 +148,7 @@
         <li><a href="#三使用protobuf">三、使用<code>protobuf</code></a>
           <ul>
             <li><a href="#1定义protobuf文件">1.定义<code>protobuf</code>文件</a></li>
-            <li><a href="#2编写buildrs-编译脚步">2.编写<code>build.rs</code> 编译脚步</a></li>
+            <li><a href="#2编写buildrs-编译脚本-生成protobuf代码">2.编写<code>build.rs</code> 编译脚本-生成protobuf代码</a></li>
             <li><a href="#3修改cargotoml">3.修改<code>Cargo.toml</code></a></li>
             <li><a href="#4告知编译器">4.告知编译器</a></li>
           </ul>
@@ -184,7 +184,7 @@ protobuf已经成为TV的事实标准，作为开发人员的瑞士军刀就不�
 </div><h2 id="二实现length加头和去头工具函数">二、实现length加头和去头工具函数</h2>
 <h3 id="1实现">1.实现</h3>
 <ul>
-<li>位于src/utils.rs</li>
+<li>位于<code>src/utils.rs</code></li>
 <li><code>write_head_and_bytes</code> 先向<code>TcpStream</code>写入数据头，再写入数据payload</li>
 <li><code>read_head_and_bytes</code> 先读取<code>4</code>字节定长数据，再读取数据</li>
 </ul>
@@ -307,7 +307,7 @@ message HotWordResponse {
 }
 </code></pre></td></tr></table>
 </div>
-</div><h3 id="2编写buildrs-编译脚步">2.编写<code>build.rs</code> 编译脚步</h3>
+</div><h3 id="2编写buildrs-编译脚本-生成protobuf代码">2.编写<code>build.rs</code> 编译脚本-生成protobuf代码</h3>
 <p>在很多编译语言，一般使用命令生成protobuf代码，rust默认里面使用<code>build.rs</code>，好处是修改protobuf文件，不会产生忘了重新生成代码的尴尬。
 <code>.out_dir</code>指定代码生成位置。<code>.inputs</code>指定.proto文件位置。</p>
 <div class="highlight"><div class="chroma">
