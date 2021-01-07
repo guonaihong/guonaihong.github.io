@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>rust-call-c on 疯狂coding</title>
+    <link>http://localhost:1313/tags/rust-call-c/</link>
+    <description>Recent content in rust-call-c on 疯狂coding</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>guonaihong</copyright>
+    <lastBuildDate>Wed, 23 Dec 2020 14:43:59 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/rust-call-c/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Call C Dynamic Library in Rust Bindgen 2</title>
+      <link>http://localhost:1313/post/call-c-dynamic-library-in-rust-bingen-2/</link>
+      <pubDate>Wed, 23 Dec 2020 14:43:59 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/call-c-dynamic-library-in-rust-bingen-2/</guid>
+      <description>前言 在Call C dynamic library in rust文章里面已经介绍了手动绑定c头文件到rust里面， 这下终于可以在rust里面使用c语言遗产。但是这里有个问题，</description>
+    </item>
+    
+    <item>
+      <title>Call C dynamic library in rust</title>
+      <link>http://localhost:1313/post/call-c-dynamic-library-in-rust/</link>
+      <pubDate>Mon, 21 Dec 2020 15:08:12 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/call-c-dynamic-library-in-rust/</guid>
+      <description>前言 c语言作为系统编程语言统治bit世界已经很久，留下了大量的代码遗产。rust作为新兴语言在一些冷门领域开发，真是裹足前行。rust如果可</description>
+    </item>
+    
+  </channel>
+</rss>

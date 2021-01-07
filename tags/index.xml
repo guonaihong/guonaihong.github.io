@@ -7,22 +7,40 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>guonaihong</copyright>
-    <lastBuildDate>Mon, 04 Jan 2021 16:35:27 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 07 Jan 2021 15:05:24 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>rust</title>
+      <link>http://localhost:1313/tags/rust/</link>
+      <pubDate>Thu, 07 Jan 2021 15:05:24 +0800</pubDate>
+      
+      <guid>http://localhost:1313/tags/rust/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rust-dyn</title>
+      <link>http://localhost:1313/tags/rust-dyn/</link>
+      <pubDate>Thu, 07 Jan 2021 15:05:24 +0800</pubDate>
+      
+      <guid>http://localhost:1313/tags/rust-dyn/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rust-trait</title>
+      <link>http://localhost:1313/tags/rust-trait/</link>
+      <pubDate>Thu, 07 Jan 2021 15:05:24 +0800</pubDate>
+      
+      <guid>http://localhost:1313/tags/rust-trait/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>protobuf</title>
       <link>http://localhost:1313/tags/protobuf/</link>
       <pubDate>Mon, 04 Jan 2021 16:35:27 +0800</pubDate>
       
       <guid>http://localhost:1313/tags/protobuf/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>rust</title>
-      <link>http://localhost:1313/tags/rust/</link>
-      <pubDate>Mon, 04 Jan 2021 16:35:27 +0800</pubDate>
-      
-      <guid>http://localhost:1313/tags/rust/</guid>
       <description></description>
     </item>
     
@@ -41,6 +59,24 @@
       <pubDate>Tue, 29 Dec 2020 13:05:58 +0800</pubDate>
       
       <guid>http://localhost:1313/tags/rust-generics/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>fork</title>
+      <link>http://localhost:1313/tags/fork/</link>
+      <pubDate>Mon, 28 Dec 2020 13:45:06 +0800</pubDate>
+      
+      <guid>http://localhost:1313/tags/fork/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rust-call-c</title>
+      <link>http://localhost:1313/tags/rust-call-c/</link>
+      <pubDate>Wed, 23 Dec 2020 14:43:59 +0800</pubDate>
+      
+      <guid>http://localhost:1313/tags/rust-call-c/</guid>
       <description></description>
     </item>
     

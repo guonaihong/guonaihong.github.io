@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>rust-trait on 疯狂coding</title>
+    <link>http://localhost:1313/tags/rust-trait/</link>
+    <description>Recent content in rust-trait on 疯狂coding</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>guonaihong</copyright>
+    <lastBuildDate>Thu, 07 Jan 2021 15:05:24 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/rust-trait/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Trait and Dyn</title>
+      <link>http://localhost:1313/post/trait-and-dyn/</link>
+      <pubDate>Thu, 07 Jan 2021 15:05:24 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/trait-and-dyn/</guid>
+      <description>一、trait trait有点类似go的interface，但和go的接口有点不一样，他是静态分发的。静态分发可能有点不好理解。下面聊dyn就</description>
+    </item>
+    
+  </channel>
+</rss>
