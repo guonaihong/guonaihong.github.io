@@ -49,7 +49,7 @@
 <meta itemprop="description" content="一、trait trait有点类似go的interface，但和go的接口有点不一样，他是静态分发的。静态分发可能有点不好理解。下面聊dyn就">
 <meta itemprop="datePublished" content="2021-01-07T15:05:24+08:00" />
 <meta itemprop="dateModified" content="2021-01-07T15:05:24+08:00" />
-<meta itemprop="wordCount" content="944">
+<meta itemprop="wordCount" content="1179">
 
 
 
@@ -124,8 +124,8 @@
       <div class="post-meta">
         <span class="post-time"> 2021-01-07 </span>
         
-          <span class="more-meta"> 约 944 字 </span>
-          <span class="more-meta"> 预计阅读 2 分钟 </span>
+          <span class="more-meta"> 约 1179 字 </span>
+          <span class="more-meta"> 预计阅读 3 分钟 </span>
         
       </div>
     </header>
@@ -374,7 +374,10 @@ rust里面的trait可以实现多态。</p>
 </span><span class="w">
 </span></code></pre></td></tr></table>
 </div>
-</div><h2 id="三完整代码地址如下">三、完整代码地址如下</h2>
+</div><p>ok，成功运行。<code>rust</code>编译器需要知道每个函数的返回类型需要多大。所以函数编译之后就需要一个具体的类型。
+我们在上面<code>if else</code>代码块里面返回<code>两个</code>不同类型，他们都实现<code>trait</code>。在编译之后会报错，选择第一个类型，类型固化就和第二个类型不一样，这也是上面报错的原因。 在函数里面动态选择不同实现是个很常见的需求，所以rust使用<code>dyn</code>关键字解决。Box返回指向堆的指针。绕过类型不一样的限制。
+<code>dyn</code>作为关键字，在语义上和<code>trait</code>有所区分。简单来说<code>一个静态分发</code>，<code>一个动态分发</code>。</p>
+<h2 id="三完整代码地址如下">三、完整代码地址如下</h2>
 <p><a href="https://github.com/guonaihong/rust-example/tree/main/trait-example">https://github.com/guonaihong/rust-example/tree/main/trait-example</a></p>
 
     </div>
