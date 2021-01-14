@@ -3,14 +3,42 @@
   
   <url>
     <loc>http://localhost:1313/post/</loc>
-    <lastmod>2021-01-07T15:05:24+08:00</lastmod>
+    <lastmod>2021-01-14T15:10:53+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/post/raw-ptr-to-slice/</loc>
+    <lastmod>2021-01-14T15:10:53+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://localhost:1313/tags/rust/</loc>
-    <lastmod>2021-01-07T15:05:24+08:00</lastmod>
+    <lastmod>2021-01-14T15:10:53+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/tags/rust-unsafe/</loc>
+    <lastmod>2021-01-14T15:10:53+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2021-01-14T15:10:53+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/</loc>
+    <lastmod>2021-01-14T15:10:53+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -30,21 +58,7 @@
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/</loc>
-    <lastmod>2021-01-07T15:05:24+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>http://localhost:1313/post/trait-and-dyn/</loc>
-    <lastmod>2021-01-07T15:05:24+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://localhost:1313/</loc>
     <lastmod>2021-01-07T15:05:24+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Raw Ptr to Slice - 疯狂coding</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="guonaihong" /><meta name="description" content="前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 一开始使用发CStr::from_ptr函数" /><meta name="keywords" content="rust, go, vim" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/raw-ptr-to-slice/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Raw Ptr to Slice" />
+<meta property="og:description" content="前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 一开始使用发CStr::from_ptr函数" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/raw-ptr-to-slice/" />
+<meta property="article:published_time" content="2021-01-14T15:10:53+08:00" />
+<meta property="article:modified_time" content="2021-01-14T15:10:53+08:00" />
+<meta itemprop="name" content="Raw Ptr to Slice">
+<meta itemprop="description" content="前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 一开始使用发CStr::from_ptr函数">
+<meta itemprop="datePublished" content="2021-01-14T15:10:53+08:00" />
+<meta itemprop="dateModified" content="2021-01-14T15:10:53+08:00" />
+<meta itemprop="wordCount" content="552">
+
+
+
+<meta itemprop="keywords" content="rust,rust-unsafe," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Raw Ptr to Slice"/>
+<meta name="twitter:description" content="前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 一开始使用发CStr::from_ptr函数"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">疯狂coding</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">疯狂coding</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Raw Ptr to Slice</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-01-14 </span>
+        
+          <span class="more-meta"> 约 552 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#前言">前言</a></li>
+        <li><a href="#一段不正确的代码">一段不正确的代码</a></li>
+        <li><a href="#阅读from_ptr实现">阅读<code>from_ptr</code>实现</a></li>
+        <li><a href="#正解代码">正解代码</a></li>
+        <li><a href="#github代码示例">github代码示例</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="前言">前言</h2>
+<p>最近在rust 调用c的时候遇到一个坑，需要从c里面把<code>char *</code>转成rust的<code>slice</code>类型。
+一开始使用发<code>CStr::from_ptr</code>函数,最后发现数据不对。</p>
+<h2 id="一段不正确的代码">一段不正确的代码</h2>
+<p>下面的代码，在返回二进制数据，有时候不全</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="kd">let</span><span class="w"> </span><span class="n">slice</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CStr</span>::<span class="n">from_ptr</span><span class="p">(</span><span class="n">grammar_data</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="o">*</span><span class="k">const</span><span class="w"> </span><span class="n">c_char</span><span class="p">)</span><span class="w">
+</span><span class="w">    </span><span class="p">.</span><span class="n">to_bytes</span><span class="p">()</span><span class="w">
+</span><span class="w">    </span><span class="p">.</span><span class="n">to_vec</span><span class="p">();</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="阅读from_ptr实现">阅读<code>from_ptr</code>实现</h2>
+<p>看了<code>from_ptr</code>实现，焕然大悟，构造的len是通过<code>sys::strlen</code>函数取得。
+c里面的<code>char *</code>是个裸指针，字符串的长度是通过，找到末尾的<code>0</code>计算得到。
+如果数据里面有<code>0</code>，那返回的<code> rust slice</code>就是错误的。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="w">    </span><span class="cp">#[stable(feature = </span><span class="s">&#34;rust1&#34;</span><span class="cp">, since = </span><span class="s">&#34;1.0.0&#34;</span><span class="cp">)]</span><span class="w">
+</span><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">from_ptr</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ptr</span>: <span class="o">*</span><span class="k">const</span><span class="w"> </span><span class="n">c_char</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="n">CStr</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">        </span><span class="c1">// SAFETY: The caller has provided a pointer that points to a valid C
+</span><span class="c1"></span><span class="w">        </span><span class="c1">// string with a NUL terminator of size less than `isize::MAX`, whose
+</span><span class="c1"></span><span class="w">        </span><span class="c1">// content remain valid and doesn&#39;t change for the lifetime of the
+</span><span class="c1"></span><span class="w">        </span><span class="c1">// returned `CStr`.
+</span><span class="c1"></span><span class="w">        </span><span class="c1">//
+</span><span class="c1"></span><span class="w">        </span><span class="c1">// Thus computing the length is fine (a NUL byte exists), the call to
+</span><span class="c1"></span><span class="w">        </span><span class="c1">// from_raw_parts is safe because we know the length is at most `isize::MAX`, meaning
+</span><span class="c1"></span><span class="w">        </span><span class="c1">// the call to `from_bytes_with_nul_unchecked` is correct.
+</span><span class="c1"></span><span class="w">        </span><span class="c1">//
+</span><span class="c1"></span><span class="w">        </span><span class="c1">// The cast from c_char to u8 is ok because a c_char is always one byte.
+</span><span class="c1"></span><span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sys</span>::<span class="n">strlen</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span><span class="w">
+</span><span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="o">*</span><span class="k">const</span><span class="w"> </span><span class="kt">u8</span><span class="p">;</span><span class="w">
+</span><span class="w">            </span><span class="n">CStr</span>::<span class="n">from_bytes_with_nul_unchecked</span><span class="p">(</span><span class="n">slice</span>::<span class="n">from_raw_parts</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w">
+</span><span class="w">        </span><span class="p">}</span><span class="w">
+</span><span class="w">    </span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="正解代码">正解代码</h2>
+<p>好了，找到原因，修复就简单。<code>std::slice::form_raw_parts</code>可以传递裸指针，和长度构造一个slice。
+这里有个小插曲，grammar_data是<code>*mut ::std::os::raw::c_void;</code>类型，直接把通过<code>fs::write(file_name, slice)</code>写入<code>slice</code>
+是不行的。所以这里把grammar_data 强转成 <code>*const u8</code>类型。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-rust" data-lang="rust"><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">slice</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span>::<span class="n">slice</span>::<span class="n">from_raw_parts</span><span class="p">(</span><span class="n">grammar_data</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="o">*</span><span class="k">const</span><span class="w"> </span><span class="kt">u8</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">);</span><span class="w">
+</span><span class="w"></span><span class="p">}</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="github代码示例">github代码示例</h2>
+<p><a href="https://github.com/guonaihong/rust-example/tree/main/raw-ptr-to-slice">https://github.com/guonaihong/rust-example/tree/main/raw-ptr-to-slice</a></p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">guonaihong</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2021-01-14
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/rust/">rust</a>
+          <a href="/tags/rust-unsafe/">rust-unsafe</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/trait-and-dyn/">
+            <span class="next-text nav-default">Trait and Dyn</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="https://github.com/guonaihong" class="iconfont icon-github" title="github"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2020 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>guonaihong</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

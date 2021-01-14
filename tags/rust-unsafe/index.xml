@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>rust-unsafe on 疯狂coding</title>
+    <link>http://localhost:1313/tags/rust-unsafe/</link>
+    <description>Recent content in rust-unsafe on 疯狂coding</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>guonaihong</copyright>
+    <lastBuildDate>Thu, 14 Jan 2021 15:10:53 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/rust-unsafe/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Raw Ptr to Slice</title>
+      <link>http://localhost:1313/post/raw-ptr-to-slice/</link>
+      <pubDate>Thu, 14 Jan 2021 15:10:53 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/raw-ptr-to-slice/</guid>
+      <description>前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 一开始使用发CStr::from_ptr函数</description>
+    </item>
+    
+  </channel>
+</rss>
