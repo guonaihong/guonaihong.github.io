@@ -3,7 +3,35 @@
   
   <url>
     <loc>http://localhost:1313/post/</loc>
-    <lastmod>2021-01-14T15:10:53+08:00</lastmod>
+    <lastmod>2021-01-14T18:42:59+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/tags/rfc7230/</loc>
+    <lastmod>2021-01-14T18:42:59+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/post/rfc7230-syntax-notation/</loc>
+    <lastmod>2021-01-14T18:42:59+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2021-01-14T18:42:59+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/</loc>
+    <lastmod>2021-01-14T18:42:59+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -24,20 +52,6 @@
   
   <url>
     <loc>http://localhost:1313/tags/rust-unsafe/</loc>
-    <lastmod>2021-01-14T15:10:53+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://localhost:1313/tags/</loc>
-    <lastmod>2021-01-14T15:10:53+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://localhost:1313/</loc>
     <lastmod>2021-01-14T15:10:53+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
