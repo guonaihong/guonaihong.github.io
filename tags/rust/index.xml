@@ -14,7 +14,7 @@
       <pubDate>Thu, 14 Jan 2021 15:10:53 +0800</pubDate>
       
       <guid>http://localhost:1313/post/raw-ptr-to-slice/</guid>
-      <description>前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 一开始使用发CStr::from_ptr函数</description>
+      <description>前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 最初使用CStr::from_ptr函数,最</description>
     </item>
     
     <item>

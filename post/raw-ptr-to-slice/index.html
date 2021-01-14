@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="guonaihong" /><meta name="description" content="前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 一开始使用发CStr::from_ptr函数" /><meta name="keywords" content="rust, go, vim" />
+<meta name="author" content="guonaihong" /><meta name="description" content="前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 最初使用CStr::from_ptr函数,最" /><meta name="keywords" content="rust, go, vim" />
 
 
 
@@ -40,23 +40,23 @@
 
 
 <meta property="og:title" content="Raw Ptr to Slice" />
-<meta property="og:description" content="前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 一开始使用发CStr::from_ptr函数" />
+<meta property="og:description" content="前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 最初使用CStr::from_ptr函数,最" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://localhost:1313/post/raw-ptr-to-slice/" />
 <meta property="article:published_time" content="2021-01-14T15:10:53+08:00" />
 <meta property="article:modified_time" content="2021-01-14T15:10:53+08:00" />
 <meta itemprop="name" content="Raw Ptr to Slice">
-<meta itemprop="description" content="前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 一开始使用发CStr::from_ptr函数">
+<meta itemprop="description" content="前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 最初使用CStr::from_ptr函数,最">
 <meta itemprop="datePublished" content="2021-01-14T15:10:53+08:00" />
 <meta itemprop="dateModified" content="2021-01-14T15:10:53+08:00" />
-<meta itemprop="wordCount" content="552">
+<meta itemprop="wordCount" content="548">
 
 
 
 <meta itemprop="keywords" content="rust,rust-unsafe," />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Raw Ptr to Slice"/>
-<meta name="twitter:description" content="前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 一开始使用发CStr::from_ptr函数"/>
+<meta name="twitter:description" content="前言 最近在rust 调用c的时候遇到一个坑，需要从c里面把char *转成rust的slice类型。 最初使用CStr::from_ptr函数,最"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -124,7 +124,7 @@
       <div class="post-meta">
         <span class="post-time"> 2021-01-14 </span>
         
-          <span class="more-meta"> 约 552 字 </span>
+          <span class="more-meta"> 约 548 字 </span>
           <span class="more-meta"> 预计阅读 2 分钟 </span>
         
       </div>
@@ -151,7 +151,7 @@
     <div class="post-content">
       <h2 id="前言">前言</h2>
 <p>最近在rust 调用c的时候遇到一个坑，需要从c里面把<code>char *</code>转成rust的<code>slice</code>类型。
-一开始使用发<code>CStr::from_ptr</code>函数,最后发现数据不对。</p>
+最初使用<code>CStr::from_ptr</code>函数,最后发现数据不对。</p>
 <h2 id="一段不正确的代码">一段不正确的代码</h2>
 <p>下面的代码，在返回二进制数据，有时候不全</p>
 <div class="highlight"><div class="chroma">
@@ -217,8 +217,8 @@ c里面的<code>char *</code>是个裸指针，字符串的长度是通过，找
 </span></code></pre></td></tr></table>
 </div>
 </div><h2 id="正解代码">正解代码</h2>
-<p>好了，找到原因，修复就简单。<code>std::slice::form_raw_parts</code>可以传递裸指针，和长度构造一个slice。
-这里有个小插曲，grammar_data是<code>*mut ::std::os::raw::c_void;</code>类型，直接把通过<code>fs::write(file_name, slice)</code>写入<code>slice</code>
+<p>好了，找到原因，修复就简单。<code>std::slice::form_raw_parts</code>可以传递<code>裸指针</code>和<code>长度</code>构造一个<code>slice</code>。
+这里有个小插曲，grammar_data是<code>*mut ::std::os::raw::c_void;</code>类型，直接通过<code>fs::write(file_name, slice)</code>写入<code>slice</code>
 是不行的。所以这里把grammar_data 强转成 <code>*const u8</code>类型。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
