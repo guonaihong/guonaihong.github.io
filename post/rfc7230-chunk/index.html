@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Rfc7230 专有名词 - 疯狂coding</title>
+  <title>Rfc7230 Chunk - 疯狂coding</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="guonaihong" /><meta name="description" content="记录下rfc7230的一些名词 https://tools.ietf.org/html/rfc7230#section-4 专有词解释 ALPHA 1 a &amp;gt;= &amp;#39;a&amp;#39; &amp;amp;&amp;amp; a &amp;lt;= &amp;#39;z&amp;#39; || a &amp;gt;= &amp;#39;A&amp;#39; &amp;amp;&amp;amp; a &amp;lt;= &amp;#39;Z&amp;#39; CR 1 &amp;#39;\r&amp;#39; CRLF 1 &amp;#34;\r\n&amp;#34; CTL TODO DIGIT 1 a &amp;gt;= &amp;#39;0&amp;#39; &amp;amp;&amp;amp; a &amp;lt;= &amp;#39;9&amp;#39; DQUOTE 1 &amp;#34; HEXDIG 1 (hexadecimal 0-9/A-F/a-f) HTAB 1 &amp;#39;\t&amp;#39; LF 1 &amp;#39;\n&amp;#39; OCTET 1" /><meta name="keywords" content="rust, go, vim" />
+<meta name="author" content="guonaihong" /><meta name="description" content="前言 rfc7230是替换rfc2616的文档，主要描述http 1.1相关内容。本文是学习http chunk封装格式笔记。 http 引入chunk，可" /><meta name="keywords" content="rust, go, vim" />
 
 
 
@@ -26,7 +26,7 @@
 <meta name="generator" content="Hugo 0.79.1 with theme even" />
 
 
-<link rel="canonical" href="http://localhost:1313/post/rfc7230-syntax-notation/" />
+<link rel="canonical" href="http://localhost:1313/post/rfc7230-chunk/" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -39,24 +39,24 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="Rfc7230 专有名词" />
-<meta property="og:description" content="记录下rfc7230的一些名词 https://tools.ietf.org/html/rfc7230#section-4 专有词解释 ALPHA 1 a &gt;= &#39;a&#39; &amp;&amp; a &lt;= &#39;z&#39; || a &gt;= &#39;A&#39; &amp;&amp; a &lt;= &#39;Z&#39; CR 1 &#39;\r&#39; CRLF 1 &#34;\r\n&#34; CTL TODO DIGIT 1 a &gt;= &#39;0&#39; &amp;&amp; a &lt;= &#39;9&#39; DQUOTE 1 &#34; HEXDIG 1 (hexadecimal 0-9/A-F/a-f) HTAB 1 &#39;\t&#39; LF 1 &#39;\n&#39; OCTET 1" />
+<meta property="og:title" content="Rfc7230 Chunk" />
+<meta property="og:description" content="前言 rfc7230是替换rfc2616的文档，主要描述http 1.1相关内容。本文是学习http chunk封装格式笔记。 http 引入chunk，可" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://localhost:1313/post/rfc7230-syntax-notation/" />
-<meta property="article:published_time" content="2021-01-14T18:42:59+08:00" />
-<meta property="article:modified_time" content="2021-01-14T18:42:59+08:00" />
-<meta itemprop="name" content="Rfc7230 专有名词">
-<meta itemprop="description" content="记录下rfc7230的一些名词 https://tools.ietf.org/html/rfc7230#section-4 专有词解释 ALPHA 1 a &gt;= &#39;a&#39; &amp;&amp; a &lt;= &#39;z&#39; || a &gt;= &#39;A&#39; &amp;&amp; a &lt;= &#39;Z&#39; CR 1 &#39;\r&#39; CRLF 1 &#34;\r\n&#34; CTL TODO DIGIT 1 a &gt;= &#39;0&#39; &amp;&amp; a &lt;= &#39;9&#39; DQUOTE 1 &#34; HEXDIG 1 (hexadecimal 0-9/A-F/a-f) HTAB 1 &#39;\t&#39; LF 1 &#39;\n&#39; OCTET 1">
-<meta itemprop="datePublished" content="2021-01-14T18:42:59+08:00" />
-<meta itemprop="dateModified" content="2021-01-14T18:42:59+08:00" />
-<meta itemprop="wordCount" content="101">
+<meta property="og:url" content="http://localhost:1313/post/rfc7230-chunk/" />
+<meta property="article:published_time" content="2021-01-16T15:34:54+08:00" />
+<meta property="article:modified_time" content="2021-01-16T15:34:54+08:00" />
+<meta itemprop="name" content="Rfc7230 Chunk">
+<meta itemprop="description" content="前言 rfc7230是替换rfc2616的文档，主要描述http 1.1相关内容。本文是学习http chunk封装格式笔记。 http 引入chunk，可">
+<meta itemprop="datePublished" content="2021-01-16T15:34:54+08:00" />
+<meta itemprop="dateModified" content="2021-01-16T15:34:54+08:00" />
+<meta itemprop="wordCount" content="612">
 
 
 
 <meta itemprop="keywords" content="rfc7230," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Rfc7230 专有名词"/>
-<meta name="twitter:description" content="记录下rfc7230的一些名词 https://tools.ietf.org/html/rfc7230#section-4 专有词解释 ALPHA 1 a &gt;= &#39;a&#39; &amp;&amp; a &lt;= &#39;z&#39; || a &gt;= &#39;A&#39; &amp;&amp; a &lt;= &#39;Z&#39; CR 1 &#39;\r&#39; CRLF 1 &#34;\r\n&#34; CTL TODO DIGIT 1 a &gt;= &#39;0&#39; &amp;&amp; a &lt;= &#39;9&#39; DQUOTE 1 &#34; HEXDIG 1 (hexadecimal 0-9/A-F/a-f) HTAB 1 &#39;\t&#39; LF 1 &#39;\n&#39; OCTET 1"/>
+<meta name="twitter:title" content="Rfc7230 Chunk"/>
+<meta name="twitter:description" content="前言 rfc7230是替换rfc2616的文档，主要描述http 1.1相关内容。本文是学习http chunk封装格式笔记。 http 引入chunk，可"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -119,13 +119,13 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title">Rfc7230 专有名词</h1>
+      <h1 class="post-title">Rfc7230 Chunk</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 2021-01-14 </span>
+        <span class="post-time"> 2021-01-16 </span>
         
-          <span class="more-meta"> 约 101 字 </span>
-          <span class="more-meta"> 预计阅读 1 分钟 </span>
+          <span class="more-meta"> 约 612 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
         
       </div>
     </header>
@@ -137,8 +137,11 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#记录下rfc7230的一些名词">记录下rfc7230的一些名词</a></li>
-        <li><a href="#专有词解释">专有词解释</a></li>
+        <li><a href="#前言">前言</a></li>
+        <li><a href="#一chunked数据格式">一、chunked数据格式</a></li>
+        <li><a href="#二chunk-extensions">二、Chunk Extensions</a></li>
+        <li><a href="#三chunked-trailer-part">三、Chunked Trailer Part</a></li>
+        <li><a href="#四解码伪代码">四、解码伪代码</a></li>
       </ul>
     </li>
   </ul>
@@ -146,137 +149,118 @@
   </div>
 </div>
     <div class="post-content">
-      <h2 id="记录下rfc7230的一些名词">记录下rfc7230的一些名词</h2>
-<p><a href="https://tools.ietf.org/html/rfc7230#section-4">https://tools.ietf.org/html/rfc7230#section-4</a></p>
-<h2 id="专有词解释">专有词解释</h2>
-<ul>
-<li>ALPHA</li>
-</ul>
+      <h2 id="前言">前言</h2>
+<p>rfc7230是替换rfc2616的文档，主要描述http 1.1相关内容。本文是学习http chunk封装格式笔记。
+http 引入chunk，可以流式发送数据包给客户端，如果服务端发一张大的图片给客户端渲染。
+使用chunk可以一个包一个小包发给浏览器。浏览器解析到一个小包，就可以渲染出来。</p>
+<h2 id="一chunked数据格式">一、chunked数据格式</h2>
+<p>chunk数据格式rfc文档位于 <a href="https://tools.ietf.org/html/rfc7230#section-4.1">https://tools.ietf.org/html/rfc7230#section-4.1</a>　
+chunk数据是由<code>chunk</code>数据，和结束chunk <code>last-chunk</code>组成</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">a &gt;= &#39;a&#39; &amp;&amp; a &lt;= &#39;z&#39; || a &gt;= &#39;A&#39; &amp;&amp; a &lt;= &#39;Z&#39;
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">     chunked-body   = *chunk
+                      last-chunk
+                      trailer-part
+                      CRLF
+
+     chunk          = chunk-size [ chunk-ext ] CRLF
+                      chunk-data CRLF
+     chunk-size     = 1*HEXDIG
+     last-chunk     = 1*(&#34;0&#34;) [ chunk-ext ] CRLF
+
+     chunk-data     = 1*OCTET ; a sequence of chunk-size octets
 </code></pre></td></tr></table>
 </div>
-</div><ul>
-<li>CR</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">&#39;\r&#39;
-</code></pre></td></tr></table>
-</div>
-</div><ul>
-<li>CRLF</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">&#34;\r\n&#34;
-</code></pre></td></tr></table>
-</div>
-</div><ul>
-<li>
-<p>CTL
-TODO</p>
-</li>
-<li>
-<p>DIGIT</p>
-</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">a &gt;= &#39;0&#39; &amp;&amp; a &lt;= &#39;9&#39;
-</code></pre></td></tr></table>
-</div>
-</div><ul>
-<li>DQUOTE</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">&#34;
-</code></pre></td></tr></table>
-</div>
-</div><ul>
-<li>HEXDIG</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">(hexadecimal 0-9/A-F/a-f)
-</code></pre></td></tr></table>
-</div>
-</div><ul>
-<li>HTAB</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">&#39;\t&#39;
-</code></pre></td></tr></table>
-</div>
-</div><ul>
-<li>LF</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">&#39;\n&#39;
-</code></pre></td></tr></table>
-</div>
-</div><ul>
-<li>OCTET</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">OCTET (any 8-bit sequence of data)
-</code></pre></td></tr></table>
-</div>
-</div><ul>
-<li>SP</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">&#39; &#39;
-</code></pre></td></tr></table>
-</div>
-</div><ul>
-<li>OWS
-OWS = *( SP / HTAB )</li>
-</ul>
+</div><h2 id="二chunk-extensions">二、Chunk Extensions</h2>
+<p>回到上面可以看到[chunk-ext]是可选的。
+chunked trailer part 由<code>; chunk-ext-name</code>和<code>[&quot;=&quot; chunk-ext-val ]</code>组成</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">for c == &#39; &#39; || c == &#39;\t&#39; {
-}
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"> chunk-ext      = *( &#34;;&#34; chunk-ext-name [ &#34;=&#34; chunk-ext-val ] )
+
+     chunk-ext-name = token
+     chunk-ext-val  = token / quoted-string
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="三chunked-trailer-part">三、Chunked Trailer Part</h2>
+<p>解析到trailer-part，把他当http header处理。但是下面的一些header是要忽略的
+Transfer-Encoding,  Content-Length,  Host，
+Content-Encoding, Content-Type, Content-Range, and Trailer</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"> trailer-part   = *( header-field CRLF )
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="四解码伪代码">四、解码伪代码</h2>
+<p>先读取chunk-size。然后读取chunk-size的数据。标准TLV解法。然后需要处理trailer-field数据</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">A process for decoding the chunked transfer coding can be represented
+   in pseudo-code as:
+
+     length := 0
+     read chunk-size, chunk-ext (if any), and CRLF
+     while (chunk-size &gt; 0) {
+        read chunk-data and CRLF
+        append chunk-data to decoded-body
+        length := length + chunk-size
+        read chunk-size, chunk-ext (if any), and CRLF
+     }
+     read trailer field
+     while (trailer field is not empty) {
+        if (trailer field is allowed to be sent in a trailer) {
+            append trailer field to existing header fields
+        }
+        read trailer-field
+     }
+     Content-Length := length
+     Remove &#34;chunked&#34; from Transfer-Encoding
+     Remove Trailer from existing header fields
 </code></pre></td></tr></table>
 </div>
 </div>
@@ -290,7 +274,7 @@ OWS = *( SP / HTAB )</li>
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
     <span class="item-content">
-        2021-01-14
+        2021-01-16
         
     </span>
   </p>
@@ -302,13 +286,13 @@ OWS = *( SP / HTAB )</li>
           <a href="/tags/rfc7230/">rfc7230</a>
           </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/rfc7230-chunk/">
+        <a class="prev" href="/post/rfc7230-header/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Rfc7230 Chunk</span>
+            <span class="prev-text nav-default">Rfc7230 Header</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
-        <a class="next" href="/post/raw-ptr-to-slice/">
-            <span class="next-text nav-default">Raw Ptr to Slice</span>
+        <a class="next" href="/post/rfc7230-syntax-notation/">
+            <span class="next-text nav-default">Rfc7230 专有名词</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>
