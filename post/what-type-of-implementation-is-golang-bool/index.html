@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Rfc7230 Header - 疯狂coding</title>
+  <title>golang bool类型是怎么实现的 - 疯狂coding</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="guonaihong" /><meta name="description" content="前言 这个笔记是看rfc7230对于http header的解析器描述。 一、header Fields https://tools.ietf.org/html/rfc7230#section-3.2.1 &amp;quot;:&amp;quot;分隔field和value" /><meta name="keywords" content="rust, go, vim" />
+<meta name="author" content="guonaihong" /><meta name="description" content="前言 wc的时候突然蹦出一个想法，golang bool是什么类型实现的。会和c一样吗？ 既然有疑问，就做个实验看下。 如果bool的值为true，" /><meta name="keywords" content="rust, go, vim" />
 
 
 
@@ -26,7 +26,7 @@
 <meta name="generator" content="Hugo 0.79.1 with theme even" />
 
 
-<link rel="canonical" href="http://localhost:1313/post/rfc7230-header/" />
+<link rel="canonical" href="http://localhost:1313/post/what-type-of-implementation-is-golang-bool/" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -39,24 +39,24 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="Rfc7230 Header" />
-<meta property="og:description" content="前言 这个笔记是看rfc7230对于http header的解析器描述。 一、header Fields https://tools.ietf.org/html/rfc7230#section-3.2.1 &quot;:&quot;分隔field和value" />
+<meta property="og:title" content="golang bool类型是怎么实现的" />
+<meta property="og:description" content="前言 wc的时候突然蹦出一个想法，golang bool是什么类型实现的。会和c一样吗？ 既然有疑问，就做个实验看下。 如果bool的值为true，" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://localhost:1313/post/rfc7230-header/" />
-<meta property="article:published_time" content="2021-01-16T16:50:12+08:00" />
-<meta property="article:modified_time" content="2021-01-16T16:50:12+08:00" />
-<meta itemprop="name" content="Rfc7230 Header">
-<meta itemprop="description" content="前言 这个笔记是看rfc7230对于http header的解析器描述。 一、header Fields https://tools.ietf.org/html/rfc7230#section-3.2.1 &quot;:&quot;分隔field和value">
-<meta itemprop="datePublished" content="2021-01-16T16:50:12+08:00" />
-<meta itemprop="dateModified" content="2021-01-16T16:50:12+08:00" />
-<meta itemprop="wordCount" content="253">
+<meta property="og:url" content="http://localhost:1313/post/what-type-of-implementation-is-golang-bool/" />
+<meta property="article:published_time" content="2021-01-18T11:54:39+08:00" />
+<meta property="article:modified_time" content="2021-01-18T11:54:39+08:00" />
+<meta itemprop="name" content="golang bool类型是怎么实现的">
+<meta itemprop="description" content="前言 wc的时候突然蹦出一个想法，golang bool是什么类型实现的。会和c一样吗？ 既然有疑问，就做个实验看下。 如果bool的值为true，">
+<meta itemprop="datePublished" content="2021-01-18T11:54:39+08:00" />
+<meta itemprop="dateModified" content="2021-01-18T11:54:39+08:00" />
+<meta itemprop="wordCount" content="481">
 
 
 
-<meta itemprop="keywords" content="rfc7230," />
+<meta itemprop="keywords" content="golang,bool," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Rfc7230 Header"/>
-<meta name="twitter:description" content="前言 这个笔记是看rfc7230对于http header的解析器描述。 一、header Fields https://tools.ietf.org/html/rfc7230#section-3.2.1 &quot;:&quot;分隔field和value"/>
+<meta name="twitter:title" content="golang bool类型是怎么实现的"/>
+<meta name="twitter:description" content="前言 wc的时候突然蹦出一个想法，golang bool是什么类型实现的。会和c一样吗？ 既然有疑问，就做个实验看下。 如果bool的值为true，"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -119,12 +119,12 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title">Rfc7230 Header</h1>
+      <h1 class="post-title">golang bool类型是怎么实现的</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 2021-01-16 </span>
+        <span class="post-time"> 2021-01-18 </span>
         
-          <span class="more-meta"> 约 253 字 </span>
+          <span class="more-meta"> 约 481 字 </span>
           <span class="more-meta"> 预计阅读 1 分钟 </span>
         
       </div>
@@ -138,11 +138,8 @@
     <li>
       <ul>
         <li><a href="#前言">前言</a></li>
-        <li><a href="#一header-fields">一、header Fields</a>
-          <ul>
-            <li><a href="#1解析header-fields">1.解析header Fields</a></li>
-          </ul>
-        </li>
+        <li><a href="#如果bool的值为true内存里面的值是">如果bool的值为true，内存里面的值是？</a></li>
+        <li><a href="#如果给bool赋值为负数是true还是false">如果给<code>bool</code>赋值为<code>负数</code>，是<code>true</code>还是<code>false</code></a></li>
       </ul>
     </li>
   </ul>
@@ -151,13 +148,11 @@
 </div>
     <div class="post-content">
       <h2 id="前言">前言</h2>
-<p>这个笔记是看rfc7230对于http header的解析器描述。</p>
-<h2 id="一header-fields">一、header Fields</h2>
-<p><a href="https://tools.ietf.org/html/rfc7230#section-3.2.1">https://tools.ietf.org/html/rfc7230#section-3.2.1</a></p>
-<ul>
-<li><code>&quot;:&quot;</code>分隔field和value</li>
-<li>OWS = *( SP /HTAB)</li>
-</ul>
+<p>wc的时候突然蹦出一个想法，<code>golang bool</code>是什么类型实现的。会和<code>c</code>一样吗？
+既然有疑问，就做个实验看下。</p>
+<h2 id="如果bool的值为true内存里面的值是">如果bool的值为true，内存里面的值是？</h2>
+<p>这里可以使用内存强转的思路看下，是驴子是马拉出来溜溜。这里提醒下，使用内存强转一定要内存对齐，<code>bool</code>占一个字节。
+如果不记得可以使用<code>unsafe.Sizeof</code>看下<code>bool</code>的内存占用。下面使用<code>uint8</code>对内存地址强转</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -172,22 +167,45 @@
 </span><span class="lnt">10
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">header-field   = field-name &#34;:&#34; OWS field-value OWS
+<pre class="chroma"><code class="language-go" data-lang="go">	<span class="c1">// 声明bool变量
+</span><span class="c1"></span>	<span class="nx">b</span> <span class="o">:=</span> <span class="kc">true</span>
 
-     field-name     = token
-     field-value    = *( field-content / obs-fold )
-     field-content  = field-vchar [ 1*( SP / HTAB ) field-vchar ]
-     field-vchar    = VCHAR / obs-text
+	<span class="c1">// 验证下bool占的数据宽度，虽然记忆是1，但还是打印确认下
+</span><span class="c1"></span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%d&#34;</span><span class="p">,</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Sizeof</span><span class="p">(</span><span class="nx">b</span><span class="p">))</span>
 
-     obs-fold       = CRLF 1*( SP / HTAB )
-                    ; obsolete line folding
-                    ; see Section 3.2.4
-</code></pre></td></tr></table>
+	<span class="c1">// 强转内存对齐，看下值
+</span><span class="c1"></span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;bool value = %d\n&#34;</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="kt">uint8</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">b</span><span class="p">)))</span>
+
+    <span class="c1">//输出:1
+</span></code></pre></td></tr></table>
 </div>
-</div><h3 id="1解析header-fields">1.解析header Fields</h3>
-<p><a href="https://tools.ietf.org/html/rfc7230#section-3.2.4">https://tools.ietf.org/html/rfc7230#section-3.2.4</a></p>
-<p>http field和':&lsquo;之间不允许有空格(<a href="https://www.mozilla.org/en-US/security/advisories/mfsa2006-33/">https://www.mozilla.org/en-US/security/advisories/mfsa2006-33/</a>)
-服务器如果收到此类数据，应该返回400</p>
+</div><p>从输出上看，bool是1 字节int无疑。这里不纠结<code>uint8</code>还是<code>int8</code>不涉及运算。这俩只是对那块内存块的解释不同。</p>
+<h2 id="如果给bool赋值为负数是true还是false">如果给<code>bool</code>赋值为<code>负数</code>，是<code>true</code>还是<code>false</code></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-go" data-lang="go">     <span class="nx">b</span> <span class="o">:=</span> <span class="kc">false</span>
+	<span class="c1">// 看下负数是true or false
+</span><span class="c1"></span>	<span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="kt">int8</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">b</span><span class="p">))</span> <span class="p">=</span> <span class="o">-</span><span class="mi">100</span>
+
+	<span class="k">if</span> <span class="nx">b</span> <span class="p">{</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;哈哈。。。证明负数转成bool也是true\n&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+
+    <span class="c1">//输出fmt.Printf的值
+</span></code></pre></td></tr></table>
+</div>
+</div><p>通过上面的例子可以说明，<code>bool</code>是<code>int8 or uint8</code>无疑。<code>0</code>为<code>false</code>，<code>非零</code>为<code>true</code></p>
 
     </div>
 
@@ -199,7 +217,7 @@
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
     <span class="item-content">
-        2021-01-16
+        2021-01-18
         
     </span>
   </p>
@@ -208,16 +226,13 @@
 </div>
 <footer class="post-footer">
       <div class="post-tags">
-          <a href="/tags/rfc7230/">rfc7230</a>
+          <a href="/tags/golang/">golang</a>
+          <a href="/tags/bool/">bool</a>
           </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/what-type-of-implementation-is-golang-bool/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">golang bool类型是怎么实现的</span>
-            <span class="prev-text nav-mobile">上一篇</span>
-          </a>
-        <a class="next" href="/post/rfc7230-chunk/">
-            <span class="next-text nav-default">Rfc7230 Chunk</span>
+        
+        <a class="next" href="/post/rfc7230-header/">
+            <span class="next-text nav-default">Rfc7230 Header</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>

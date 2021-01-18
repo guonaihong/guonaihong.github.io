@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>bool on 疯狂coding</title>
+    <link>http://localhost:1313/tags/bool/</link>
+    <description>Recent content in bool on 疯狂coding</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>guonaihong</copyright>
+    <lastBuildDate>Mon, 18 Jan 2021 11:54:39 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/bool/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>golang bool类型是怎么实现的</title>
+      <link>http://localhost:1313/post/what-type-of-implementation-is-golang-bool/</link>
+      <pubDate>Mon, 18 Jan 2021 11:54:39 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/what-type-of-implementation-is-golang-bool/</guid>
+      <description>前言 wc的时候突然蹦出一个想法，golang bool是什么类型实现的。会和c一样吗？ 既然有疑问，就做个实验看下。 如果bool的值为true，</description>
+    </item>
+    
+  </channel>
+</rss>

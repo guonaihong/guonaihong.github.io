@@ -7,7 +7,25 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>guonaihong</copyright>
-    <lastBuildDate>Sat, 16 Jan 2021 16:50:12 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 18 Jan 2021 11:54:39 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>bool</title>
+      <link>http://localhost:1313/tags/bool/</link>
+      <pubDate>Mon, 18 Jan 2021 11:54:39 +0800</pubDate>
+      
+      <guid>http://localhost:1313/tags/bool/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>golang</title>
+      <link>http://localhost:1313/tags/golang/</link>
+      <pubDate>Mon, 18 Jan 2021 11:54:39 +0800</pubDate>
+      
+      <guid>http://localhost:1313/tags/golang/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>rfc7230</title>
       <link>http://localhost:1313/tags/rfc7230/</link>
