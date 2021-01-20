@@ -49,7 +49,7 @@
 <meta itemprop="description" content="前言 rfc7230是替换rfc2616的文档，主要描述http 1.1相关内容。本文是学习http chunk封装格式笔记。 http 引入chunk，可">
 <meta itemprop="datePublished" content="2021-01-16T15:34:54+08:00" />
 <meta itemprop="dateModified" content="2021-01-16T15:34:54+08:00" />
-<meta itemprop="wordCount" content="612">
+<meta itemprop="wordCount" content="695">
 
 
 
@@ -124,7 +124,7 @@
       <div class="post-meta">
         <span class="post-time"> 2021-01-16 </span>
         
-          <span class="more-meta"> 约 612 字 </span>
+          <span class="more-meta"> 约 695 字 </span>
           <span class="more-meta"> 预计阅读 2 分钟 </span>
         
       </div>
@@ -138,10 +138,15 @@
     <li>
       <ul>
         <li><a href="#前言">前言</a></li>
-        <li><a href="#一chunked数据格式">一、chunked数据格式</a></li>
-        <li><a href="#二chunk-extensions">二、Chunk Extensions</a></li>
-        <li><a href="#三chunked-trailer-part">三、Chunked Trailer Part</a></li>
-        <li><a href="#四解码伪代码">四、解码伪代码</a></li>
+        <li><a href="#一chunked数据格式">一chunked数据格式</a>
+          <ul>
+            <li><a href="#1-chunked-body">1. chunked-body</a></li>
+            <li><a href="#2last-chunk">2.<code>last-chunk</code></a></li>
+            <li><a href="#3-chunk-ext">3. <code>chunk-ext</code></a></li>
+            <li><a href="#4-trailer-part">4. <code>trailer-part</code></a></li>
+          </ul>
+        </li>
+        <li><a href="#二解码伪代码">二、解码伪代码</a></li>
       </ul>
     </li>
   </ul>
@@ -153,22 +158,18 @@
 <p>rfc7230是替换rfc2616的文档，主要描述http 1.1相关内容。本文是学习http chunk封装格式笔记。
 http 引入chunk，可以流式发送数据包给客户端，如果服务端发一张大的图片给客户端渲染。
 使用chunk可以一个包一个小包发给浏览器。浏览器解析到一个小包，就可以渲染出来。</p>
-<h2 id="一chunked数据格式">一、chunked数据格式</h2>
-<p>chunk数据格式rfc文档位于 <a href="https://tools.ietf.org/html/rfc7230#section-4.1">https://tools.ietf.org/html/rfc7230#section-4.1</a>　
-chunk数据是由<code>chunk</code>数据，和结束chunk <code>last-chunk</code>组成</p>
+<h2 id="一chunked数据格式">一chunked数据格式</h2>
+<p>chunk数据格式rfc文档位于 <a href="https://tools.ietf.org/html/rfc7230#section-4.1">https://tools.ietf.org/html/rfc7230#section-4.1</a>　</p>
+<h3 id="1-chunked-body">1. chunked-body</h3>
+<p><code>chunked-body</code>数据由<code>chunk</code>数据，<code>last-chunk</code>组成, <code>trailer-part CRLF</code> 组成</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-fallback" data-lang="fallback">     chunked-body   = *chunk
@@ -176,15 +177,59 @@ chunk数据是由<code>chunk</code>数据，和结束chunk <code>last-chunk</cod
                       trailer-part
                       CRLF
 
-     chunk          = chunk-size [ chunk-ext ] CRLF
-                      chunk-data CRLF
-     chunk-size     = 1*HEXDIG
-     last-chunk     = 1*(&#34;0&#34;) [ chunk-ext ] CRLF
 
-     chunk-data     = 1*OCTET ; a sequence of chunk-size octets
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="二chunk-extensions">二、Chunk Extensions</h2>
+</div><h4 id="10-chunk-是主要数据段由以下部分组成">1.0 <code>chunk</code> 是主要数据段，由以下部分组成</h4>
+<ul>
+<li><code>chunk-size</code>  必选</li>
+<li><code>[chunk-ext]</code> 可选</li>
+<li><code>CRLF chunk-data CRLF</code> 必选</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">     chunk          = chunk-size [ chunk-ext ] CRLF
+                      chunk-data CRLF
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="11chunk-size-数据格式">1.1<code>chunk-size</code> 数据格式</h4>
+<p>由<code>至少一个16进制字符</code>组成，所以这里遇到不是<code>16进制</code>的直接报错。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">     chunk-size     = 1*HEXDIG
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="12-chunk-data">1.2. <code>chunk-data</code></h4>
+<p>这个没啥好聊的，bytes数据。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">     chunk-data     = 1*OCTET ; a sequence of chunk-size octets
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="2last-chunk">2.<code>last-chunk</code></h3>
+<ul>
+<li>1*(&ldquo;0&rdquo;) 由1至多个0组成</li>
+<li><code>[chunk-ext] CRLF</code></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">     last-chunk     = 1*(&#34;0&#34;) [ chunk-ext ] CRLF
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="3-chunk-ext">3. <code>chunk-ext</code></h3>
 <p>回到上面可以看到[chunk-ext]是可选的。
 chunked trailer part 由<code>; chunk-ext-name</code>和<code>[&quot;=&quot; chunk-ext-val ]</code>组成</p>
 <div class="highlight"><div class="chroma">
@@ -201,7 +246,7 @@ chunked trailer part 由<code>; chunk-ext-name</code>和<code>[&quot;=&quot; chu
      chunk-ext-val  = token / quoted-string
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="三chunked-trailer-part">三、Chunked Trailer Part</h2>
+</div><h3 id="4-trailer-part">4. <code>trailer-part</code></h3>
 <p>解析到trailer-part，把他当http header处理。但是下面的一些header是要忽略的
 Transfer-Encoding,  Content-Length,  Host，
 Content-Encoding, Content-Type, Content-Range, and Trailer</p>
@@ -213,7 +258,7 @@ Content-Encoding, Content-Type, Content-Range, and Trailer</p>
 <pre class="chroma"><code class="language-fallback" data-lang="fallback"> trailer-part   = *( header-field CRLF )
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="四解码伪代码">四、解码伪代码</h2>
+</div><h2 id="二解码伪代码">二、解码伪代码</h2>
 <p>先读取chunk-size。然后读取chunk-size的数据。标准TLV解法。然后需要处理trailer-field数据</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
