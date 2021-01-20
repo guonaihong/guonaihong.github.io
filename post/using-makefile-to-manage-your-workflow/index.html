@@ -49,7 +49,7 @@
 <meta itemprop="description" content="前言 Makefile主要出现在c/c&#43;&#43;的项目居多，用来管理c/c&#43;&#43;的编译依赖。 这里的用法有点非主流的感觉，但是经过本人的实践。用好Mak">
 <meta itemprop="datePublished" content="2021-01-20T11:40:26+08:00" />
 <meta itemprop="dateModified" content="2021-01-20T11:40:26+08:00" />
-<meta itemprop="wordCount" content="1233">
+<meta itemprop="wordCount" content="1360">
 
 
 
@@ -124,7 +124,7 @@
       <div class="post-meta">
         <span class="post-time"> 2021-01-20 </span>
         
-          <span class="more-meta"> 约 1233 字 </span>
+          <span class="more-meta"> 约 1360 字 </span>
           <span class="more-meta"> 预计阅读 3 分钟 </span>
         
       </div>
@@ -235,12 +235,16 @@
 </span></code></pre></td></tr></table>
 </div>
 </div><ul>
+<li><code>FROM</code> 使用<code>alpine:3.7</code>基础镜像构建自己的镜像</li>
 <li><code>RUN</code> 运行shell命令</li>
 <li><code>COPY</code> 本地文件拷贝到镜像里面</li>
-<li><code>WORKDIR</code> 设置镜像工作目录，下面的<code>CMD</code>命令都没有使用绝对路径```/opt/service````，就是这个指令的作用</li>
+<li><code>WORKDIR</code> 设置镜像工作目录，下面的<code>CMD</code>命令都没有使用绝对路径<code>/opt/service</code>就可以执行<code>start.sh</code>命令，
+就是这个指令的作用</li>
 <li><code>CMD</code> 类似编程语言的<code>main</code>函数。入口指令</li>
 </ul>
 <h3 id="3-startsh内容">3. <code>start.sh</code>内容</h3>
+<p>使用<code>start.sh</code>包裹服务启动脚本，是为了把经常变的部分放到<code>start.sh</code>里面。不变的部分放到<code>Dockerfile</code>里面维护。
+<code>debug</code>的时候，就发现这个方式比CMD直接放启动命令好多了。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -290,7 +294,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="二优化工作流">二、优化工作流</h2>
-<p>如果上面的脚本一遍过，基本也不需要优化工作流，如果一次不成功，遇到疑难杂症。来来回回几次(删除，创建，运行)。
+<p>如果上面的脚本一遍过，基本也不需要优化工作流，如果一次不成功，遇到疑难杂症。<code>来来回回几次</code>(删除，创建，运行)。
 就要吐了。 遇到这种情况，大家第一个反应是使用<code>bash</code>优化流程。先来个<code>switch case</code>骨架代码，他接受不同参数，运行不同子命令</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
