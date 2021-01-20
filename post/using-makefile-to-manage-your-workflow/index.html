@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>老瓶装新酒--使用makefile优化你的工作流 - 疯狂coding</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="guonaihong" /><meta name="description" content="前言 Makefile主要出现在c/c&#43;&#43;的项目居多，用来管理c/c&#43;&#43;的编译依赖。 这里的用法有点非主流的感觉，但是经过本人的实践。用好Mak" /><meta name="keywords" content="rust, go, vim" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/using-makefile-to-manage-your-workflow/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="老瓶装新酒--使用makefile优化你的工作流" />
+<meta property="og:description" content="前言 Makefile主要出现在c/c&#43;&#43;的项目居多，用来管理c/c&#43;&#43;的编译依赖。 这里的用法有点非主流的感觉，但是经过本人的实践。用好Mak" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/using-makefile-to-manage-your-workflow/" />
+<meta property="article:published_time" content="2021-01-20T11:40:26+08:00" />
+<meta property="article:modified_time" content="2021-01-20T11:40:26+08:00" />
+<meta itemprop="name" content="老瓶装新酒--使用makefile优化你的工作流">
+<meta itemprop="description" content="前言 Makefile主要出现在c/c&#43;&#43;的项目居多，用来管理c/c&#43;&#43;的编译依赖。 这里的用法有点非主流的感觉，但是经过本人的实践。用好Mak">
+<meta itemprop="datePublished" content="2021-01-20T11:40:26+08:00" />
+<meta itemprop="dateModified" content="2021-01-20T11:40:26+08:00" />
+<meta itemprop="wordCount" content="1233">
+
+
+
+<meta itemprop="keywords" content="makefile,docker," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="老瓶装新酒--使用makefile优化你的工作流"/>
+<meta name="twitter:description" content="前言 Makefile主要出现在c/c&#43;&#43;的项目居多，用来管理c/c&#43;&#43;的编译依赖。 这里的用法有点非主流的感觉，但是经过本人的实践。用好Mak"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">疯狂coding</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">疯狂coding</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">老瓶装新酒--使用makefile优化你的工作流</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-01-20 </span>
+        
+          <span class="more-meta"> 约 1233 字 </span>
+          <span class="more-meta"> 预计阅读 3 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#前言">前言</a></li>
+        <li><a href="#一演示创建一个docker容器的过程">一、演示创建一个docker容器的过程</a>
+          <ul>
+            <li><a href="#1准备一个虚拟的服务">1.准备一个虚拟的服务</a></li>
+            <li><a href="#2创建docker镜像">2.创建docker镜像</a></li>
+            <li><a href="#3-startsh内容">3. <code>start.sh</code>内容</a></li>
+            <li><a href="#4编译容器">4.编译容器</a></li>
+            <li><a href="#5运行容器">5.运行容器</a></li>
+            <li><a href="#6删除容器">6.删除容器</a></li>
+            <li><a href="#7删除镜像">7.删除镜像</a></li>
+          </ul>
+        </li>
+        <li><a href="#二优化工作流">二、优化工作流</a></li>
+        <li><a href="#三优化工作流">三、优化工作流</a></li>
+        <li><a href="#github-源码位置">github 源码位置</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="前言">前言</h2>
+<p><code>Makefile</code>主要出现在<code>c/c++</code>的项目居多，用来管理<code>c/c++</code>的编译依赖。
+这里的用法有点非主流的感觉，但是经过本人的实践。用好<code>Makefile</code>可以事半功倍。</p>
+<h2 id="一演示创建一个docker容器的过程">一、演示创建一个docker容器的过程</h2>
+<p>这里只是为了演示工作流程，所以对<code>docker</code>命令的介绍会一带而过。
+下面给一个微服务，做个docker镜像。并启动这个容器。</p>
+<h3 id="1准备一个虚拟的服务">1.准备一个虚拟的服务</h3>
+<ul>
+<li>编译命令</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">env <span class="nv">CGO_ENABLED</span><span class="o">=</span><span class="m">0</span> go build main.go
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>源码
+你可以看到这个虚拟服务只是打印一句话就退出，这个虚拟服务替换成你的业务服务</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;fmt&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;vim-go&#34;</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="2创建docker镜像">2.创建docker镜像</h3>
+<p><code>alpine</code> 是docker里面比较mini的镜像，大约<code>4MB</code>左右，特别适合把服务拆得很散。
+<code>ubuntu</code>镜像占<code>100-200MB</code>的样子。来个7-8个微服务。啥也不干，第一次pull 1G空间都没了。
+如果docker registry和项目开发不在一个网段，中间使用外网通信。上传，下载的时间也相当可观。
+使用<code>alpine</code>大约可以节省<code>10x</code>等待时间。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="k">FROM</span><span class="s"> alpine:3.7</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">RUN</span> mkdir -p /opt/service<span class="err">
+</span><span class="err"></span><span class="k">COPY</span> ./main /opt/service<span class="err">
+</span><span class="err"></span><span class="k">COPY</span> ./start.sh /opt/service<span class="err">
+</span><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /opt/service</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;./start.sh&#34;</span><span class="p">]</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>RUN</code> 运行shell命令</li>
+<li><code>COPY</code> 本地文件拷贝到镜像里面</li>
+<li><code>WORKDIR</code> 设置镜像工作目录，下面的<code>CMD</code>命令都没有使用绝对路径```/opt/service````，就是这个指令的作用</li>
+<li><code>CMD</code> 类似编程语言的<code>main</code>函数。入口指令</li>
+</ul>
+<h3 id="3-startsh内容">3. <code>start.sh</code>内容</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">./main
+
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="4编译容器">4.编译容器</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">sudo docker build -t demo:v1 .
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="5运行容器">5.运行容器</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">sudo docker run --net<span class="o">=</span>host --name demo_v1 -d demo:v1
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="6删除容器">6.删除容器</h3>
+<p>没问题，就不同删除容器</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">sudo docker rm demo_v1
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="7删除镜像">7.删除镜像</h3>
+<p>没问题，就不同删除镜像</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">sudo docker rmi demo:v1
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="二优化工作流">二、优化工作流</h2>
+<p>如果上面的脚本一遍过，基本也不需要优化工作流，如果一次不成功，遇到疑难杂症。来来回回几次(删除，创建，运行)。
+就要吐了。 遇到这种情况，大家第一个反应是使用<code>bash</code>优化流程。先来个<code>switch case</code>骨架代码，他接受不同参数，运行不同子命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># 文件名 workflow.sh</span>
+<span class="c1">#!/bin/sh</span>
+
+<span class="k">case</span> <span class="s2">&#34;</span><span class="nv">$1</span><span class="s2">&#34;</span> in
+    <span class="s2">&#34;build&#34;</span> <span class="o">)</span>
+        <span class="nb">echo</span> <span class="nv">$1</span>
+        <span class="p">;;</span>
+
+    <span class="s2">&#34;reset.docker&#34;</span> <span class="o">)</span>
+        <span class="nb">echo</span> <span class="nv">$1</span>
+        <span class="p">;;</span>
+
+    <span class="s2">&#34;build.docker&#34;</span> <span class="o">)</span>
+        <span class="nb">echo</span> <span class="nv">$1</span>
+        <span class="p">;;</span>
+
+    <span class="s2">&#34;run.docker&#34;</span> <span class="o">)</span>
+        <span class="nb">echo</span> <span class="nv">$1</span>
+        <span class="p">;;</span>
+
+<span class="k">esac</span>
+
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>运行</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">sh  workflow.sh build
+</code></pre></td></tr></table>
+</div>
+</div><p>好了，把上面的docker命令，移动到 workflow.sh脚步里面，加速工作流</p>
+<h2 id="三优化工作流">三、优化工作流</h2>
+<p>如果你对第二步已经满足就不用看第三步。第二步要写<code>switch case</code>骨架代码。有没有一种方式，原生支持多入口子命令执行。答:<code>Makefile</code>
+ok。现在使用Makefile重构上面的shell脚本。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Makefile" data-lang="Makefile"><span class="k">export </span><span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy.cn
+<span class="k">export </span><span class="nv">GO111MODULE</span><span class="o">=</span>on
+
+<span class="c"># 模拟-编译go服务
+</span><span class="c"></span><span class="nf">build</span><span class="o">:</span>
+    <span class="nb">echo</span> <span class="s2">&#34;这里放编译命令,同理下面也是&#34;</span>
+
+<span class="c"># 清理，重新创建
+</span><span class="c"></span><span class="nf">reset.docker</span><span class="o">:</span> <span class="n">clean</span>.<span class="n">docker</span> <span class="n">build</span>.<span class="n">docker</span>
+
+<span class="c"># docker build list clean
+</span><span class="c"></span><span class="nf">build.docker</span><span class="o">:</span>
+
+<span class="c"># 运行
+</span><span class="c"></span><span class="nf">run.docker</span><span class="o">:</span>
+
+<span class="c"># 删除容器和镜像
+</span><span class="c"></span><span class="nf">clean.docker</span><span class="o">:</span> <span class="n">clean</span>.<span class="n">container</span> <span class="n">clean</span>.<span class="n">images</span> 
+
+<span class="c"># 删除镜像
+</span><span class="c"></span><span class="nf">clean.images</span><span class="o">:</span>
+
+<span class="c"># 删除容器
+</span><span class="c"></span><span class="nf">clean.container</span><span class="o">:</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>运行</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">make -f workflow.make build
+</code></pre></td></tr></table>
+</div>
+</div><p><code>Makefile</code>不仅完成第二步内容，还支持命令组合。比如上面的<code>reset.docker</code>命令，就是先执行<code>clean.docker</code>后执行<code>build.docker</code>
+当然，这里为了演示使用<code>workflow.make</code>文件名，如果使用默认<code>Makefile</code>文件名是不需要<code>make -f</code>指定<code>Makefile</code>脚本文件，直接<code>make build</code>就可以。</p>
+<h2 id="github-源码位置">github 源码位置</h2>
+<p><a href="https://github.com/guonaihong/go-example/tree/main/docker-alpine">https://github.com/guonaihong/go-example/tree/main/docker-alpine</a></p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">guonaihong</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2021-01-20
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/makefile/">makefile</a>
+          <a href="/tags/docker/">docker</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/what-type-of-implementation-is-golang-bool/">
+            <span class="next-text nav-default">golang bool类型是怎么实现的</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="https://github.com/guonaihong" class="iconfont icon-github" title="github"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2020 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>guonaihong</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

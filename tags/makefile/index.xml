@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>makefile on 疯狂coding</title>
+    <link>http://localhost:1313/tags/makefile/</link>
+    <description>Recent content in makefile on 疯狂coding</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>guonaihong</copyright>
+    <lastBuildDate>Wed, 20 Jan 2021 11:40:26 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/makefile/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>老瓶装新酒--使用makefile优化你的工作流</title>
+      <link>http://localhost:1313/post/using-makefile-to-manage-your-workflow/</link>
+      <pubDate>Wed, 20 Jan 2021 11:40:26 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/using-makefile-to-manage-your-workflow/</guid>
+      <description>前言 Makefile主要出现在c/c++的项目居多，用来管理c/c++的编译依赖。 这里的用法有点非主流的感觉，但是经过本人的实践。用好Mak</description>
+    </item>
+    
+  </channel>
+</rss>

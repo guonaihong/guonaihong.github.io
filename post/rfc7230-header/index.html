@@ -49,7 +49,7 @@
 <meta itemprop="description" content="前言 这个笔记是看rfc7230对于http header的解析器描述。 一、header Fields https://tools.ietf.org/html/rfc7230#section-3.2.1 &quot;:&quot;分隔field和value">
 <meta itemprop="datePublished" content="2021-01-16T16:50:12+08:00" />
 <meta itemprop="dateModified" content="2021-01-16T16:50:12+08:00" />
-<meta itemprop="wordCount" content="253">
+<meta itemprop="wordCount" content="546">
 
 
 
@@ -124,8 +124,8 @@
       <div class="post-meta">
         <span class="post-time"> 2021-01-16 </span>
         
-          <span class="more-meta"> 约 253 字 </span>
-          <span class="more-meta"> 预计阅读 1 分钟 </span>
+          <span class="more-meta"> 约 546 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
         
       </div>
     </header>
@@ -141,6 +141,7 @@
         <li><a href="#一header-fields">一、header Fields</a>
           <ul>
             <li><a href="#1解析header-fields">1.解析header Fields</a></li>
+            <li><a href="#2field-value-components">2.Field Value Components</a></li>
           </ul>
         </li>
       </ul>
@@ -186,8 +187,46 @@
 </div>
 </div><h3 id="1解析header-fields">1.解析header Fields</h3>
 <p><a href="https://tools.ietf.org/html/rfc7230#section-3.2.4">https://tools.ietf.org/html/rfc7230#section-3.2.4</a></p>
-<p>http field和':&lsquo;之间不允许有空格(<a href="https://www.mozilla.org/en-US/security/advisories/mfsa2006-33/">https://www.mozilla.org/en-US/security/advisories/mfsa2006-33/</a>)
-服务器如果收到此类数据，应该返回400</p>
+<p>http field和':&lsquo;之间不允许有空格，服务器如果收到此类数据，应该返回400 (<a href="https://www.mozilla.org/en-US/security/advisories/mfsa2006-33/">https://www.mozilla.org/en-US/security/advisories/mfsa2006-33/</a>)
+field value前面后者后面是可选的OWS
+过去支持field value可以扩展到多行。但是rf7230不支持这种形式。如果收到obs，返回400。</p>
+<h3 id="2field-value-components">2.Field Value Components</h3>
+<p><a href="https://tools.ietf.org/html/rfc7230#section-3.2.6">https://tools.ietf.org/html/rfc7230#section-3.2.6</a></p>
+<p>Most HTTP header field values are defined using common syntax
+components (token, quoted-string, and comment) separated by
+whitespace or specific delimiting characters.  Delimiters are chosen
+from the set of US-ASCII visual characters not allowed in a token
+(DQUOTE and &ldquo;(),/:;&lt;=&gt;?@[]{}&quot;).</p>
+<pre><code> token          = 1*tchar
+
+ tchar          = &quot;!&quot; / &quot;#&quot; / &quot;$&quot; / &quot;%&quot; / &quot;&amp;&quot; / &quot;'&quot; / &quot;*&quot;
+                / &quot;+&quot; / &quot;-&quot; / &quot;.&quot; / &quot;^&quot; / &quot;_&quot; / &quot;`&quot; / &quot;|&quot; / &quot;~&quot;
+                / DIGIT / ALPHA
+                ; any VCHAR, except delimiters
+</code></pre>
+<p>A string of text is parsed as a single value if it is quoted using
+double-quote marks.</p>
+<pre><code> quoted-string  = DQUOTE *( qdtext / quoted-pair ) DQUOTE
+ qdtext         = HTAB / SP /%x21 / %x23-5B / %x5D-7E / obs-text
+ obs-text       = %x80-FF
+</code></pre>
+<p>Comments can be included in some HTTP header fields by surrounding
+the comment text with parentheses.  Comments are only allowed in
+fields containing &ldquo;comment&rdquo; as part of their field value definition.</p>
+<pre><code> comment        = &quot;(&quot; *( ctext / quoted-pair / comment ) &quot;)&quot;
+ ctext          = HTAB / SP / %x21-27 / %x2A-5B / %x5D-7E / obs-text
+</code></pre>
+<p>The backslash octet (&quot;&quot;) can be used as a single-octet quoting
+mechanism within quoted-string and comment constructs.  Recipients
+that process the value of a quoted-string MUST handle a quoted-pair
+as if it were replaced by the octet following the backslash.</p>
+<pre><code> quoted-pair    = &quot;\&quot; ( HTAB / SP / VCHAR / obs-text )
+</code></pre>
+<p>A sender SHOULD NOT generate a quoted-pair in a quoted-string except
+where necessary to quote DQUOTE and backslash octets occurring within
+that string.  A sender SHOULD NOT generate a quoted-pair in a comment
+except where necessary to quote parentheses [&quot;(&rdquo; and &ldquo;)&quot;] and
+backslash octets occurring within that comment.</p>
 
     </div>
 
