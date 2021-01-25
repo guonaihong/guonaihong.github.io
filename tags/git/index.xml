@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>git on 疯狂coding</title>
+    <link>http://localhost:1313/tags/git/</link>
+    <description>Recent content in git on 疯狂coding</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>guonaihong</copyright>
+    <lastBuildDate>Mon, 25 Jan 2021 15:07:32 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/git/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>git patch 笔记</title>
+      <link>http://localhost:1313/post/git-patch-notes/</link>
+      <pubDate>Mon, 25 Jan 2021 15:07:32 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/git-patch-notes/</guid>
+      <description>前言 前段时间，由于sh的git仓库缺少运维，所以迁移到bj。迁移之后发现其中某个git的commit信息丢失。 下面记录下一种，git commit 合并的</description>
+    </item>
+    
+  </channel>
+</rss>
