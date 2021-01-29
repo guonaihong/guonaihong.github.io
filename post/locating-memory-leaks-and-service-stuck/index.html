@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>定位服务内存泄露和卡死方法(总结) - 疯狂coding</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="guonaihong" /><meta name="description" content="前言 总结一下，也许时间久了，一些方法就忘了。下面的方法都是实战中用过的，各有适用场景。 一、卡死、go程泄露&amp;ndash;获取调用栈 1.go build -ra" /><meta name="keywords" content="rust, go, vim" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/locating-memory-leaks-and-service-stuck/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="定位服务内存泄露和卡死方法(总结)" />
+<meta property="og:description" content="前言 总结一下，也许时间久了，一些方法就忘了。下面的方法都是实战中用过的，各有适用场景。 一、卡死、go程泄露&ndash;获取调用栈 1.go build -ra" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/locating-memory-leaks-and-service-stuck/" />
+<meta property="article:published_time" content="2021-01-28T17:22:53+08:00" />
+<meta property="article:modified_time" content="2021-01-28T17:22:53+08:00" />
+<meta itemprop="name" content="定位服务内存泄露和卡死方法(总结)">
+<meta itemprop="description" content="前言 总结一下，也许时间久了，一些方法就忘了。下面的方法都是实战中用过的，各有适用场景。 一、卡死、go程泄露&ndash;获取调用栈 1.go build -ra">
+<meta itemprop="datePublished" content="2021-01-28T17:22:53+08:00" />
+<meta itemprop="dateModified" content="2021-01-28T17:22:53+08:00" />
+<meta itemprop="wordCount" content="712">
+
+
+
+<meta itemprop="keywords" content="golang,memory-leaks,service-stuck," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="定位服务内存泄露和卡死方法(总结)"/>
+<meta name="twitter:description" content="前言 总结一下，也许时间久了，一些方法就忘了。下面的方法都是实战中用过的，各有适用场景。 一、卡死、go程泄露&ndash;获取调用栈 1.go build -ra"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">疯狂coding</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">疯狂coding</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">定位服务内存泄露和卡死方法(总结)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-01-28 </span>
+        
+          <span class="more-meta"> 约 712 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#前言">前言</a></li>
+        <li><a href="#一卡死go程泄露--获取调用栈">一、卡死、go程泄露&ndash;获取调用栈</a>
+          <ul>
+            <li><a href="#1go-build--race编译选项">1.<code>go build -race</code>编译选项</a></li>
+            <li><a href="#2-kill--6-pid方式">2. <code>kill -6 pid</code>方式</a></li>
+            <li><a href="#3-使用dlv调试">3. 使用<code>dlv</code>调试</a></li>
+          </ul>
+        </li>
+        <li><a href="#二内存">二、内存</a>
+          <ul>
+            <li><a href="#1-ps方式">1. <code>ps</code>方式</a></li>
+            <li><a href="#2-pprof方法">2. <code>pprof</code>方法</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="前言">前言</h2>
+<p>总结一下，也许时间久了，一些方法就忘了。下面的方法都是实战中用过的，各有适用场景。</p>
+<h2 id="一卡死go程泄露--获取调用栈">一、卡死、go程泄露&ndash;获取调用栈</h2>
+<h3 id="1go-build--race编译选项">1.<code>go build -race</code>编译选项</h3>
+<p>适用于开发自测，和线上少量灰度。使用简单只要加上<code>-race</code>选项就行。
+有线程不安全的代码会打印出调用栈<br>
+假如服务端卡死，客户端请求过来，会增加go程，超过4096(记得不是太清楚)的样子，进程就会退出，然后打印所有调用栈
+对了，如果是正式上线的服务，需要把<code>-race</code>选项去除<br>
+<em>注意</em> :使用带race选项编译，如果你的服务有问题。进程会退出的。<br>
+<em>最佳实践</em> :对于长期跑的服务，怎么处理<code>race</code>选项，在服务第一个版本上线，可以少量灰度加<code>race</code>选项</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">go build -race example.go
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="2-kill--6-pid方式">2. <code>kill -6 pid</code>方式</h3>
+<p>这个方法不依赖go的工具链，适合手头没有趁手工具，通过发送信号的方式，让进程打印所有调用栈到stdout上。<br>
+缺点:会把进程杀死</p>
+<h3 id="3-使用dlv调试">3. 使用<code>dlv</code>调试</h3>
+<p>dlv对于golang，就像gdb对于c一样，重要性和位置不言而喻。</p>
+<ul>
+<li>安装</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">go get -u github.com/derekparker/delve/cmd/dlv
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>挂载到进程里面
+dlv的一些命令和gdb类似，以前调试c经常用gdb attach pid挂载到进程看所有线程</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">dlv attach pid
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>显示所有协程</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">goroutines
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>切换线程
+id是通过goroutines 得到的数字</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">goroutine id
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>打印当前调用栈</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">bt
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="二内存">二、内存</h2>
+<h3 id="1-ps方式">1. <code>ps</code>方式</h3>
+<p>如果是运行中的进程，把进程名换成你实际的服务名，通过观察ps命令第<code>5列</code>得到虚拟内存,
+<code>第6列</code>得到物理内存</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">ps aux |grep process_name|grep -v grep|awk &#39;{print $5, $6}&#39;
+</code></pre></td></tr></table>
+</div>
+</div><p>然后导入数据到<code>execl</code>里面画一个曲线，观察下内存趋势。这个方法也适用于<code>c/c++</code>
+然后先观察调用栈，可以回到第一个方法</p>
+<h3 id="2-pprof方法">2. <code>pprof</code>方法</h3>
+<h4 id="pprof查看内存使用">pprof查看内存使用</h4>
+<ul>
+<li>导入包路径</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">_ &#34;net/http/pprof&#34;
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>启动http服务</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">http.ListenAndServe(&#34;localhost:8082&#34;, nil)
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>查看内存使用</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">go tool pprof http://localhost:8082/debug/pprof/heap
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="pprof其他用法记录">pprof其他用法记录</h4>
+<ul>
+<li>查看阻塞go程</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">go tool pprof http://localhost:8082/debug/pprof/block
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">guonaihong</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2021-01-28
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/golang/">golang</a>
+          <a href="/tags/memory-leaks/">memory-leaks</a>
+          <a href="/tags/service-stuck/">service-stuck</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/git-patch-notes/">
+            <span class="next-text nav-default">git patch 笔记</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="https://github.com/guonaihong" class="iconfont icon-github" title="github"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2020 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>guonaihong</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

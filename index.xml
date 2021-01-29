@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>guonaihong</copyright>
-    <lastBuildDate>Mon, 25 Jan 2021 15:07:32 +0800</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 28 Jan 2021 17:22:53 +0800</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>定位服务内存泄露和卡死方法(总结)</title>
+      <link>http://localhost:1313/post/locating-memory-leaks-and-service-stuck/</link>
+      <pubDate>Thu, 28 Jan 2021 17:22:53 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/locating-memory-leaks-and-service-stuck/</guid>
+      <description>前言 总结一下，也许时间久了，一些方法就忘了。下面的方法都是实战中用过的，各有适用场景。 一、卡死、go程泄露&amp;ndash;获取调用栈 1.go build -ra</description>
+    </item>
+    
     <item>
       <title>git patch 笔记</title>
       <link>http://localhost:1313/post/git-patch-notes/</link>
